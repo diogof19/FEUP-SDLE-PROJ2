@@ -1,5 +1,4 @@
 import threading
-import asyncio
 
 from node import Node
 from .user_info import UserInfo
