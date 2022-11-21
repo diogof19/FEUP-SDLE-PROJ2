@@ -4,7 +4,7 @@ import os
 
 from kademlia.network import Server
 from utils.node_utils import read_config_file
-from models.user_info import UserInfo
+from model.user_info import UserInfo
 
 class Node:
     def __init__(self, ip : str, port : int, bootstrap_file : str) -> None:
