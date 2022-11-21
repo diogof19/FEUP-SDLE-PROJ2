@@ -1,2 +1,4 @@
 kademlia>=2.2.2
 asyncio>=3.4.3
+dataclasses-json==0.5.7
+fastapi==0.87.0 
