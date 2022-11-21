@@ -41,9 +41,8 @@ python main.py -timeline 'name'
 import sys
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QLabel
-#from view.timeline_window import TimelineWindow
-from view.start_window import StartWindow
+from PySide6.QtWidgets import QApplication
+from view.main_window import MainWindow
 
                                                      
 
@@ -51,6 +50,6 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
-    timeline_window = StartWindow()
+    timeline_window = MainWindow()
 
     sys.exit(app.exec())

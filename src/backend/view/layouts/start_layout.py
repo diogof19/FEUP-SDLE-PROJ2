@@ -2,29 +2,23 @@ from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QLineEdit, QMa
 from PySide6.QtCore import Slot, Qt
 from PySide6.QtGui import QGuiApplication
 
-from .consts import WINDOW_BACKGROUND_COLOR, WINDOW_COLOR, HIGHLIGHT_COLOR
+from ..consts import WINDOW_BACKGROUND_COLOR, WINDOW_COLOR, HIGHLIGHT_COLOR
 
-class StartWindow(QMainWindow):
+class StartLayout(QHBoxLayout):
     def __init__(self):
         super().__init__()
-        self.title = 'Singer'
-        self.left = 100
-        self.top = 100
-        self.width = 640
-        self.height = 480
         self.setup()
-        
-    def setup(self):
-        self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
-        self.setStyleSheet(f'\
-            background-color: {WINDOW_BACKGROUND_COLOR};\
-            color: {WINDOW_COLOR};\
-        ')
 
+    def setup(self):
+        # Left side
+        left_side = QVBoxLayout()
+        left_side.addWidget(QWidget())
+
+        # Center
         vertical_layout = QVBoxLayout()
 
         username_field = QLineEdit()
+        username_field.width = 100
         username_field.setStyleSheet(f'\
             background-color: {WINDOW_BACKGROUND_COLOR};\
             border: 3px solid {HIGHLIGHT_COLOR};\
@@ -35,6 +29,7 @@ class StartWindow(QMainWindow):
         horizontal_layout = QHBoxLayout()
         
         login_button = QPushButton('Login')
+        login_button.width = 40
         login_button.setToolTip('This s an example login_button')
         login_button.setStyleSheet("\
             background-color: #FFFFFF;\
@@ -42,7 +37,8 @@ class StartWindow(QMainWindow):
         ")
         login_button.clicked.connect(self.login)
 
-        register_button = QPushButton('Register')
+        register_button = QPushButton('Register')        
+        register_button.width = 40
         register_button.setToolTip('This s an example register_button')
         register_button.setStyleSheet("\
             background-color: #FFFFFF;\
@@ -56,13 +52,15 @@ class StartWindow(QMainWindow):
         vertical_layout.addWidget(username_field)
         vertical_layout.addLayout(horizontal_layout)
 
-        widget = QWidget()
-        widget.setLayout(vertical_layout)
+        # Right side
+        right_side = QVBoxLayout()
+        right_side.addWidget(QWidget())
 
-        self.setCentralWidget(widget)
-
-        self.show()
-        
+        self.addLayout(left_side)
+        self.addLayout(vertical_layout)
+        self.addLayout(right_side)
+    
+    
     @Slot()
     def login(self):
         print('PyQt5 login_button click')
