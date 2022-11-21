@@ -2,8 +2,9 @@ import sys
 import asyncio
 from kademlia.network import Server
 
-from communication import sender
-from communication import listener
+from comms import sender
+from comms import listener
+
 '''
 python main.py -register 'name' 'port'
 python main.py -timeline 'name'
