@@ -1,4 +1,3 @@
-
 def read_config_file(config_file_path):
     """Reads the config file and returns the config dictionary.
 
