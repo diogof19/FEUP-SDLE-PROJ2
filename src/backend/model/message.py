@@ -9,3 +9,24 @@ class Message:
         args['username'] = username
         args['message_type'] = message_type
         return json.dumps(args)
+
+    @staticmethod
+    def follow_message(username : str) -> str:
+        """
+        Create a follow message
+        """
+        return Message.create_message(username, 'follow', {})
+
+    @staticmethod
+    def unfollow_message(username : str) -> str:
+        """
+        Create a unfollow message
+        """
+        return Message.create_message(username, 'unfollow', {})
+
+    @staticmethod
+    def post_message(username : str, post_id : int, body : str) -> str:
+        """
+        Create a post message
+        """
+        return Message.create_message(username, 'post', {'post_id': post_id, 'body': body})

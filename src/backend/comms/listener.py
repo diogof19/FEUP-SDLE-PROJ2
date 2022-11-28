@@ -2,16 +2,21 @@ import asyncio
 from threading import Thread, Event
 
 class Listener(Thread):
-    def __init__(self, ip : str, port : int) -> None:
+    def __init__(self, ip : str, port : int, user) -> None:
         super().__init__()
         self.ip = ip
         self.port = port
+        self.user = user
 
     async def request_handler(self, reader, _) -> None:
         """
         Handles incoming requests.
         """
         message = await reader.read(-1)
+
+        print(message.decode())
+
+        print(await self.user.get_kademlia_info(self.user.username))
 
         print(message)
 

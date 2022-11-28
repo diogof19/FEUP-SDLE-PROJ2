@@ -3,3 +3,4 @@ asyncio>=3.4.3
 dataclasses-json==0.5.7
 fastapi==0.87.0
 PySide6==6.4.0.1
+ntplib==0.4.0 

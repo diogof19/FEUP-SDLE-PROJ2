@@ -1,14 +1,15 @@
 import sqlite3
 
-from os import exists
+from os.path import exists
 
 class PostsDatabase:
     def __init__(self, username):
-        self.db_path = f'./db/{username}.db'
+        self.db_path = f'./db/{username}.db'        
+        exists_db = exists(self.db_path)
 
         self.connection = sqlite3.connect(self.db_path, check_same_thread=False, isolation_level=None)
 
-        if not exists(self.db_path):
+        if not exists_db:
             self.create_tables()
 
     def create_tables(self):

@@ -1,9 +1,13 @@
 import sys
 import asyncio
 from kademlia.network import Server
+from model.user import User
+from threading import Thread
 
 from comms import sender
 from comms import listener
+
+from controller.controller import Controller
 
 '''
 python main.py -register 'name' 'port'
@@ -11,45 +15,29 @@ python main.py -timeline 'name'
 
 '''
 
-# async def main():
-#     #server = Server()
-    
-#     #boostrap_node = (sys.argv[1], int(sys.argv[2]))
-#     #await server.bootstrap([boostrap_node])
-#     if(len(sys.argv) == 4): # ip port msg
-#         await sender.send_message(sys.argv[1], int(sys.argv[2]), sys.argv[3]), asyncio.get_event_loop()
-#     else: #ip port
-#         #await server.listen(int(sys.argv[2]))
-#         server_listener = listener.Listener(sys.argv[1], int(sys.argv[2]))
-#         server_listener.daemon = True
+def main():
+    peer = User(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4])
 
-#         server_listener.start()
+    Thread(target=peer.loop.run_forever).start()
 
-#         try:
-#             while True:
-#                 pass
-#         except KeyboardInterrupt:
-#             server_listener.stop()
-        
-#     #server.stop()
-    
-#     #node = Node(sys.argv[1], int(sys.argv[2]), sys.argv[3])
+    controller = Controller(peer)
+    controller.start()
 
-# if __name__ == "__main__":
-#     asyncio.run(main())
+if __name__ == "__main__":
+    main()
 
-import sys
+# import sys
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication
-from view.main_window import MainWindow
+# from PySide6.QtCore import Qt
+# from PySide6.QtWidgets import QApplication
+# from view.main_window import MainWindow
 
                                                      
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    app = QApplication(sys.argv)
+#     app = QApplication(sys.argv)
 
-    timeline_window = MainWindow()
+#     timeline_window = MainWindow()
 
-    sys.exit(app.exec())
+#     sys.exit(app.exec())

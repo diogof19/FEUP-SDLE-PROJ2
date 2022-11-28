@@ -3,13 +3,18 @@ import json
 from dataclasses import dataclass, asdict
 from dataclasses_json import dataclass_json
 
-@dataclass
 @dataclass_json
+@dataclass
 class UserInfo:
     ip : str
     port : int
     followers : list[str]
     following : list[str]
+    last_post_id : int = 0
+
+    def increment_post_id(self) -> int:
+        self.last_post_id += 1
+        return self.last_post_id
 
     @property
     def serialize(self):

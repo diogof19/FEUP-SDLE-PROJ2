@@ -14,7 +14,7 @@ def sync_time() -> None:
                 debug_ntp(response)
             return 
         except ntplib.NTPException:
-            print(f'NTP request failed, attempt number {attempt + 1}')
+            #print(f'NTP request failed, attempt number {attempt + 1}')
             pass
 
 def debug_ntp(response : ntplib.NTPStats) -> None:
