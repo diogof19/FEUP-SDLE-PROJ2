@@ -31,8 +31,8 @@ class Node:
             logging.basicConfig(level=logging.DEBUG)
         logging.getLogger("kademlia").setLevel(logging.INFO)
 
-    def send_message(self, dest_ip : str, dest_port : int, message : str) -> None:
-        self.loop.run_until_complete(Sender.send_message(dest_ip, dest_port, message))
+    async def send_message(self, dest_ip : str, dest_port : int, message : str) -> None:
+        self.loop.run_until_complete(await Sender.send_message(dest_ip, dest_port, message))
 
     async def set_kademlia_info(self, username : str, info : UserInfo) -> None:
         await self.server.set(username, info.serialize)

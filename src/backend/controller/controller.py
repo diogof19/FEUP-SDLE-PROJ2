@@ -8,12 +8,12 @@ class Controller:
         """
         Start the controller
         """        
-        self.user.start_listening() 
         while True:
             cmd = input('Enter command: ')
 
             if cmd == 'register':
                 print(run_in_loop(self.user.register(), self.user.loop).result())
+                self.user.start_listening() 
             elif cmd == 'post':
                 self.post()
             elif cmd == 'follow':

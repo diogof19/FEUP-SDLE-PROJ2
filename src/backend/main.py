@@ -18,7 +18,7 @@ python main.py -timeline 'name'
 def main():
     peer = User(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4])
 
-    Thread(target=peer.loop.run_forever).start()
+    Thread(target=peer.loop.run_forever, daemon=True).start()
 
     controller = Controller(peer)
     controller.start()
@@ -38,10 +38,10 @@ if __name__ == "__main__":
 
 #     app = QApplication(sys.argv)
 
-    timeline_window = MainWindow()
+    # timeline_window = MainWindow()
 
-    with open("view/layouts/style.qss", "r") as f:
-        _style = f.read()
-        timeline_window.setStyleSheet(_style)
+    # with open("view/layouts/style.qss", "r") as f:
+    #     _style = f.read()
+    #     timeline_window.setStyleSheet(_style)
 
 #     sys.exit(app.exec())

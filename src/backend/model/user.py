@@ -55,10 +55,10 @@ class User(Node):
             raise Exception(f'User {username} not found')
         
         self.info.following.append(username)
-        self.set_kademlia_info(self.username, self.info)
+        await self.set_kademlia_info(self.username, self.info)
 
         new_follow_info.followers.append(self.username)
-        self.set_kademlia_info(username, new_follow_info)
+        await self.set_kademlia_info(username, new_follow_info)
 
         await self.send_message(new_follow_info.ip, new_follow_info.port, Message.follow_message(self.username))
 
@@ -96,6 +96,6 @@ class User(Node):
         print(f'Registering user {self.username}')
         await self.set_kademlia_info(self.username, self.info)
         print(f'User {self.username} registered')
-        self.init_database()
+        #self.init_database()
 
         return True
