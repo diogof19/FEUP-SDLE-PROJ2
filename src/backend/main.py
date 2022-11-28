@@ -51,5 +51,9 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     timeline_window = MainWindow()
+    
+    with open("view/layouts/style.qss", "r") as f:
+        _style = f.read()
+        timeline_window.setStyleSheet(_style)
 
     sys.exit(app.exec())

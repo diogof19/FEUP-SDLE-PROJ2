@@ -1,0 +1,40 @@
+#start_title {
+    color: #2e1a47;
+    font: 100px;
+    qproperty-alignment: AlignCenter;
+    text-align: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#auth_card {
+    max-width: 500px;
+    max-height: 200px;
+    border-radius: 5px;
+    border: 1px solid grey;
+    padding: 40px;
+}
+
+#username_field {
+    background-color: grey;
+    border: 1px solid darkgrey;
+    border-radius: 5px;
+    color: black;
+    font-size: x-large;
+    padding: 5%;
+    margin: 0px;
+}
+
+#login_button, #register_button {
+    background-color: #2e1a47;
+    border: 1px solid darkgrey;
+    border-radius: 5px;
+    color: lightgrey;
+    font-size: large;
+    padding: 5%;
+    width: 70%;
+}
+
+#register_button {
+    margin-right: 20px;
+}
