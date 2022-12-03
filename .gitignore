@@ -1,3 +1,4 @@
 /src/backend/venv/
 __pycache__/
 pyvenv.cfg
+src/backend/database/db/*

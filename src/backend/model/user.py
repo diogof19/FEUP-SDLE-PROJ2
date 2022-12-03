@@ -84,6 +84,8 @@ class User(Node):
         """
         self.info.increment_post_id()
         self.database.insert_post(self.info.last_post_id, self.username, body)
+        
+        await self.set_kademlia_info(self.username, self.info)
 
         for follower in self.info.followers:
             follower_info = await self.get_kademlia_info(follower)
@@ -96,6 +98,6 @@ class User(Node):
         print(f'Registering user {self.username}')
         await self.set_kademlia_info(self.username, self.info)
         print(f'User {self.username} registered')
-        #self.init_database()
+        self.init_database()
 
         return True

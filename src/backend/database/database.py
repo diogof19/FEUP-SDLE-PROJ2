@@ -5,11 +5,8 @@ from os import getcwd
 
 class PostsDatabase:
     def __init__(self, username):
-        self.db_path = join(getcwd(), 'db', f'{username}.db')        
+        self.db_path = join(getcwd(), 'database', 'db', f'{username}.db')
         exists_db = exists(self.db_path)
-
-        print(self.db_path)
-        print(exists_db)
 
         self.connection = sqlite3.connect(self.db_path, check_same_thread=False, isolation_level=None)
 
