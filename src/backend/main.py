@@ -26,17 +26,18 @@ def main():
 if __name__ == "__main__":
     main()
 
-# import sys
 
-# from PySide6.QtCore import Qt
-# from PySide6.QtWidgets import QApplication
-# from view.main_window import MainWindow
+""" import sys
+
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QApplication
+from view.main_window import MainWindow
 
                                                      
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 
-#     app = QApplication(sys.argv)
+    app = QApplication(sys.argv)
 
     # timeline_window = MainWindow()
 
@@ -44,4 +45,4 @@ if __name__ == "__main__":
     #     _style = f.read()
     #     timeline_window.setStyleSheet(_style)
 
-#     sys.exit(app.exec())
+    sys.exit(app.exec()) """

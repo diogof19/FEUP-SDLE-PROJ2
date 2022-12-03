@@ -5,9 +5,10 @@ from PySide6.QtGui import QGuiApplication
 from ..consts import WINDOW_BACKGROUND_COLOR, WINDOW_COLOR, HIGHLIGHT_COLOR
 
 class StartLayout(QHBoxLayout):
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
         self.setup()
+        self.parent = parent
 
     def setup(self):
         # Left side
@@ -78,6 +79,7 @@ class StartLayout(QHBoxLayout):
     @Slot()
     def login(self):
         print('PyQt5 login_button click')
+        self.parent.actions()[0].trigger()
 
     @Slot()
     def register(self):

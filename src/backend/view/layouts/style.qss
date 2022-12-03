@@ -38,3 +38,30 @@
 #register_button {
     margin-right: 20px;
 }
+
+#post_card {
+    border-radius: 5px;
+    border: 1px solid #2e1a47;
+}
+
+#post_title {
+    border: 0px;
+}
+
+#post_username {
+    color: #2e1a47;
+    font: large;
+    font-weight: bold;
+}
+
+#post_date {
+    color: grey;
+    font: small;
+}
+
+#post_body {
+    margin-left: 7px;
+    margin-right: 7px;
+    margin-bottom: 7px
+}
+
