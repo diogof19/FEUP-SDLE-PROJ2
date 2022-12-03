@@ -91,6 +91,8 @@ class User(Node):
             follower_info = await self.get_kademlia_info(follower)
             self.send_message(follower_info.ip, follower_info.port, Message.post_message(self.username, self.info.last_post_id, body))
 
+        return True
+
     async def register(self) -> None:
         """
         Register the user

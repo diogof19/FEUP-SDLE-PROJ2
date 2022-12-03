@@ -1,12 +1,12 @@
 import sys
 import asyncio
+import signal
+
 from kademlia.network import Server
 from model.user import User
 from threading import Thread
-
 from comms import sender
 from comms import listener
-
 from controller.controller import Controller
 
 '''
@@ -14,14 +14,30 @@ python main.py -register 'name' 'port'
 python main.py -timeline 'name'
 
 '''
+thread = None
+controller = None
 
 def main():
     peer = User(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4])
 
-    Thread(target=peer.loop.run_forever, daemon=True).start()
+    thread = Thread(target=peer.loop.run_forever, daemon=True)
+
+    thread.start()
 
     controller = Controller(peer)
-    controller.start()
+
+    def signal_handler():
+        try:
+            peer.stop_ntp.set()
+        except:
+            pass
+
+    signal.signal(signal.SIGINT, lambda s, f: signal_handler())
+
+    try:
+        controller.start()
+    except KeyboardInterrupt:
+        pass
 
 if __name__ == "__main__":
     main()
