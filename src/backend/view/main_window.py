@@ -28,6 +28,10 @@ class MainWindow(QMainWindow):
         login_action.triggered.connect(self.login)
         self.addAction(login_action)
         
+        reload_action = QWidgetAction(self)
+        reload_action.triggered.connect(self.reload)
+        self.addAction(reload_action)
+        
         layout = StartLayout(self)
 
         widget = QWidget()
@@ -41,7 +45,8 @@ class MainWindow(QMainWindow):
     def login(self):
         print("Login in parent")
         
-        layout = TimelineLayout()
+        layout = TimelineLayout(self)
+        layout.setAlignment(Qt.AlignTop)
         
         widget = QWidget()
         widget.width = 400
@@ -51,3 +56,16 @@ class MainWindow(QMainWindow):
 
         self.show()
         
+    def reload(self):
+        print("Reloading")
+        
+        layout = TimelineLayout(self)
+        layout.setAlignment(Qt.AlignTop)
+        
+        widget = QWidget()
+        widget.width = 400
+        widget.setLayout(layout)
+
+        self.setCentralWidget(widget)
+
+        self.show()

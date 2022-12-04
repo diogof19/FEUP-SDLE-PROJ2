@@ -17,7 +17,7 @@ python main.py -timeline 'name'
 thread = None
 controller = None
 
-def main():
+""" def main():
     peer = User(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4])
 
     thread = Thread(target=peer.loop.run_forever, daemon=True)
@@ -40,25 +40,24 @@ def main():
         pass
 
 if __name__ == "__main__":
-    main()
+    main() """
 
 
-""" import sys
+import sys
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 from view.main_window import MainWindow
-
                                                      
 
 if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
-    # timeline_window = MainWindow()
+    timeline_window = MainWindow()
 
-    # with open("view/layouts/style.qss", "r") as f:
-    #     _style = f.read()
-    #     timeline_window.setStyleSheet(_style)
+    with open("view/layouts/style.qss", "r") as f:
+        _style = f.read()
+        timeline_window.setStyleSheet(_style)
 
-    sys.exit(app.exec()) """
+    sys.exit(app.exec())

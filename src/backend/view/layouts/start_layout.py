@@ -61,8 +61,6 @@ class StartLayout(QHBoxLayout):
         vertical_layout.addWidget(title)
         vertical_layout.addWidget(card)
         
-        
-        
         # Right side
         right_side = QVBoxLayout()
         right_side.addWidget(QWidget())

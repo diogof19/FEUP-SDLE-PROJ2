@@ -39,6 +39,33 @@
     margin-right: 20px;
 }
 
+#input_post {
+    border-radius: 5px;
+    border: 1px solid #2e1a47;
+    color: black;
+    font-size: x-large;
+    padding: 5%;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+#create_post_button {
+    background-color: #2e1a47;
+    border: 1px solid #2e1a47;
+    border-radius: 5px;
+    color: white;
+    font-size: x-large;
+    padding: 5%;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+#horizontal_separator {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
 #post_card {
     border-radius: 5px;
     border: 1px solid #2e1a47;
@@ -63,5 +90,23 @@
     margin-left: 7px;
     margin-right: 7px;
     margin-bottom: 7px
+}
+
+#scroll_posts, #info_widget, #followers_scroll, #followers_list {
+    border: 0px;
+    margin: 0px;
+}
+
+#followers_widget, #following_widget {
+    border-radius: 5px;
+    border: 1px solid #2e1a47;
+    margin-left: 10px;
+    margin-top: 0px;
+}
+
+#followers_title, #following_title {
+    color: #2e1a47;
+    font: 15px;
+    font-weight: bold;
 }
 
