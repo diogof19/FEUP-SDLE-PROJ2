@@ -21,12 +21,13 @@ class TimelineLayout(QGridLayout):
         header_layout.setContentsMargins(10, 10, 10, 10)
         header_layout.setAlignment(Qt.AlignRight)
         
-        name = QLabel('User1')
+        name = QLabel(self.parent.controller.get_username())
         name.setObjectName('timeline_header_name')
         header_layout.addWidget(name)
         
         logout = QPushButton('Logout')
         logout.setObjectName('timeline_header_logout')
+        logout.clicked.connect(self.logout)
         header_layout.addWidget(logout)
         
         header.setLayout(header_layout)
@@ -132,14 +133,8 @@ class TimelineLayout(QGridLayout):
         super().addWidget(info_widget, 1, 2)
         
     def get_all_posts(self):
-        post1 = {'username': 'User11111111111111111111', 'body':'Body text sdasdsdasdasdasdasdasdasdasdasdasdasdsdsdadasdasdasdasdasdsdadasdd', 'date': '2021-01-01'}
-        post2 = {'username': 'User2', 'body':'Body text', 'date': '2021-01-01'}
-        post3 = {'username': 'User2', 'body':'Body text', 'date': '2021-01-01'}
-        post4 = {'username': 'User2', 'body':'Body text', 'date': '2021-01-01'}
-        post5 = {'username': 'User2', 'body':'Body text', 'date': '2021-01-01'}
-        post6 = {'username': 'User2', 'body':'Body text', 'date': '2021-01-01'}
-        
-        return [post1, post2, post3, post4, post5, post6]
+        posts = self.parent.controller.get_posts(self.parent.controller.get_username())
+        return posts
     
     def create_post_card(self, post):
         card = QGroupBox()
@@ -150,12 +145,12 @@ class TimelineLayout(QGridLayout):
         
         layout = QVBoxLayout()
         
-        username = QLabel(post['username'])
+        username = QLabel(post[1])
         username.setObjectName('post_username')
         username.setAlignment(Qt.AlignLeft)
         username.setMargin(0)
         
-        date = QLabel(post['date'])
+        date = QLabel(post[3])
         date.setObjectName('post_date')
         date.setAlignment(Qt.AlignRight)
         date.setMargin(0)
@@ -172,7 +167,7 @@ class TimelineLayout(QGridLayout):
         
         title.setLayout(title_layout)
         
-        body = QLabel(post['body'])
+        body = QLabel(post[2])
         body.setObjectName('post_body')
         body.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         body.setAlignment(Qt.AlignLeft)
@@ -187,10 +182,10 @@ class TimelineLayout(QGridLayout):
         return card
     
     def get_all_following(self):
-        return ['User3', 'User4']
+        return self.parent.controller.get_following()
     
     def get_all_followers(self):
-        return ['User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6', 'User6','User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6']
+        return self.parent.controller.get_followers()
     
     def on_search_text_changed(self, text):
         self.search_text = text
@@ -205,16 +200,12 @@ class TimelineLayout(QGridLayout):
         
     def unfollow(self, username):
         print('unfollow:', username)
-        
-        #DO UNFOLLOW
-        
+        self.parent.controller.unfollow(username)
         self.parent.reload()
     
     def follow(self, username):
         print('follow:', username)
-        
-        #DO FOLLOW
-        
+        self.parent.controller.follow(username)
         self.parent.reload()
     
     def create_search_widget(self):
@@ -387,8 +378,8 @@ class TimelineLayout(QGridLayout):
     
     def create_post(self):
         print('Create post:', self.post_text)
-        self.reload()
+        self.parent.controller.post(self.post_text)
+        self.parent.reload()
         
-    def reload(self):
-        self.parent.actions()[1].trigger()
-        #super().update()
+    def logout(self):
+        self.parent.setup()
