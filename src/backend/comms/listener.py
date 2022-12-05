@@ -1,5 +1,6 @@
 import asyncio
 from threading import Thread, Event
+from model.message import Message
 from comms.handlers import postHandler,followHandler
 
 class Listener(Thread):
@@ -16,6 +17,8 @@ class Listener(Thread):
         """
         message = await reader.read(-1)
 
+        message = Message.parse_message(message)
+        
         if(message['message_type'] == 'post'):
             postHandler(self.user.database, message['post_id'], message['username'], message['body'])
         elif(message['message_type'] == 'follow'):

@@ -1,6 +1,12 @@
 import json
 
 class Message:
+
+    @staticmethod
+    def parse_message(message: str):
+        message.strip()
+        return json.loads(message)
+
     @staticmethod
     def create_message(username : str, message_type : str, args : dict) -> str:
         """
