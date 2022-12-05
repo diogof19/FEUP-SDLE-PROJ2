@@ -69,3 +69,20 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
         self.show()
+        
+    def do_search(self, text):
+        print('Searching:', text)
+        
+        #GET SEARCH RESULTS
+        search_results = ['User1', 'User2', 'User3']
+        
+        layout = TimelineLayout(self, search_results=search_results)
+        layout.setAlignment(Qt.AlignTop)
+        
+        widget = QWidget()
+        widget.width = 400
+        widget.setLayout(layout)
+
+        self.setCentralWidget(widget)
+
+        self.show()
