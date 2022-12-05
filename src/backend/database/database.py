@@ -41,25 +41,32 @@ class PostsDatabase:
     def add_follower(self, username: str):
         self.connection.execute(
             'INSERT INTO followers (username) VALUES (?);',
-            (username)
+            (username,)
         )
 
     def del_follower(self, username: str):
-        pass
+        self.connection.execute(
+            'DELETE FROM followers WHERE username == ?;',
+            (username,)
+        )
 
     def get_followers(self):
         self.connection.execute(
-            'SELECT username FROM followers'
+            'SELECT username FROM followers;'
             )
 
     def add_following(self, username: str):
         self.connection.execute(
             'INSERT INTO following (username) VALUES (?);',
-            (username)
+            (username,)
         )
 
     def del_following(self, username: str):
-        pass
+        self.connection.execute(
+            'DELETE FROM following WHERE username == ?;',
+            (username,)
+        )        
+        self.del_posts_for_user(username)
 
     def get_following(self):
         self.connection.execute(
@@ -69,6 +76,14 @@ class PostsDatabase:
     def get_posts_for_user(self, username):
         cursor = self.connection.execute(
             'SELECT * FROM posts WHERE username = ? ORDER BY date DESC;',
+            (username,)
+        )
+
+        return cursor.fetchall()
+
+    def del_posts_for_user(self, username):
+        cursor = self.connection.execute(
+            'DELETE FROM posts WHERE username = ?;',
             (username,)
         )
 
