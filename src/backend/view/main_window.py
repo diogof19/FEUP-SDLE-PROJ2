@@ -83,13 +83,10 @@ class MainWindow(QMainWindow):
 
         self.show()
         
-    def do_search(self, text):
-        print('Searching', text)
+    def logout(self):
+        print("Logout")
         
-        #GET SEARCH RESULTS
-        search_results = ['User1', 'User2', 'User3']
-        
-        layout = TimelineLayout(self, search_results=search_results)
+        layout = StartLayout(self)
         layout.setAlignment(Qt.AlignTop)
         
         widget = QWidget()

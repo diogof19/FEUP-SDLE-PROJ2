@@ -8,6 +8,9 @@ from database.database import PostsDatabase
 from comms.listener import Listener
 from comms.sender import Sender
 
+from os.path import exists, join
+from os import getcwd
+
 
 class User(Node):
     def __init__(self, ip  : str, port : int, username : str, bootstrap_file : str) -> None:
@@ -123,7 +126,13 @@ class User(Node):
         """
         print(f'Logging in user {self.username}')
 
+        user_exists = True
         if await self.get_kademlia_info(self.username) is None:
+            user_exists = False
+        elif not exists(join(getcwd(), 'database', 'db', f'{self.username}.db')):
+            user_exists = True
+            
+        if not user_exists:
             raise Exception(f'User {self.username} does not exist')
 
         self.info = await self.get_kademlia_info(self.username)

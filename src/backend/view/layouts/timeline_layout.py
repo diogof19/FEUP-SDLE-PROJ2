@@ -3,12 +3,11 @@ from PySide6.QtCore import Slot, Qt, QSize
 from PySide6 import QtWidgets
 
 class TimelineLayout(QGridLayout):
-    def __init__(self, parent, search_results=[]):
+    def __init__(self, parent):
         super().__init__()
         self.parent = parent
         self.post_text = ""
-        self.search_text = ""
-        self.search_results = search_results
+        self.follow_text = ""
         
         super().setContentsMargins(0, 0, 0, 0)
         self.setup()
@@ -183,100 +182,17 @@ class TimelineLayout(QGridLayout):
     def get_all_followers(self):
         return self.parent.controller.get_followers()
     
-    def on_search_text_changed(self, text):
-        self.search_text = text
-        print('search text changed:', text)
-        
-    def search(self):
-        #DO SEARCH
-        """ self.search_results = ['User7', 'User8']
-        print('search results:', self.search_results)
-        super().update() """
-        self.parent.do_search(self.search_text)
+    def on_follow_text_changed(self, text):
+        self.follow_text = text
         
     def unfollow(self, username):
         print('unfollow:', username)
         self.parent.controller.unfollow(username)
         self.parent.reload()
     
-    def follow(self, username):
-        print('follow:', username)
-        self.parent.controller.follow(username)
+    def follow(self):
+        self.parent.controller.follow(self.follow_text)
         self.parent.reload()
-    
-    def create_search_widget(self):
-        widget = QGroupBox()
-        widget.setObjectName('followers_widget')
-        widget.setMaximumSize(400, 400)
-        widget.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
-        
-        layout = QVBoxLayout()
-        
-        search = QLineEdit()
-        search.setObjectName('input_post')
-        search.setPlaceholderText('Search Users')
-        search.setMaximumWidth(300)
-        search.setAlignment(Qt.AlignLeft)
-        search.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
-        search.textChanged.connect(self.on_search_text_changed)
-        
-        search_button = QPushButton('Search')
-        search_button.setObjectName('create_post_button')
-        search_button.clicked.connect(self.search)
-        search_button.setMaximumWidth(100)
-        search.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
-        
-        search_layout = QHBoxLayout()
-        
-        search_layout.setSpacing(0)
-        search_layout.addWidget(search)
-        search_layout.setSpacing(0)
-        search_layout.addWidget(search_button)
-
-        layout.setSpacing(0)
-        layout.addLayout(search_layout)
-        
-        results_layout = QVBoxLayout()
-        following_list = self.get_all_following()
-        for result in self.search_results:
-            result_layout = QHBoxLayout()
-            
-            result_name = self.create_follow_widget(result)
-            result_name.setAlignment(Qt.AlignVCenter)
-            
-            if(result in following_list):
-                result_button = QPushButton('Unfollow')
-                result_button.setObjectName('unfollow_button')
-                result_button.clicked.connect(lambda: self.unfollow(result))
-            else:
-                result_button = QPushButton('Follow')
-                result_button.setObjectName('follow_button')
-                result_button.clicked.connect(lambda: self.follow(result))
-            
-            result_layout.setSpacing(0)
-            result_layout.addWidget(result_name)
-            result_layout.setSpacing(0)
-            result_layout.addWidget(result_button)
-            
-            results_layout.setSpacing(0)
-            results_layout.addLayout(result_layout)
-            
-        results_widget = QGroupBox()
-        results_widget.setObjectName('followers_list')
-        results_widget.setLayout(results_layout)
-        
-        results_scroll = QScrollArea()
-        results_scroll.setWidgetResizable(True)
-        results_scroll.setContentsMargins(0, 0, 0, 0)
-        results_scroll.setViewportMargins(0, 0, 0, 0)
-        results_scroll.setObjectName('followers_scroll')
-        results_scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
-        results_scroll.setWidget(results_widget)
-        
-        layout.addWidget(results_scroll)
-        widget.setLayout(layout)
-        
-        return widget
         
     def create_follow_widget(self, follow):
         username = QLabel(follow)
@@ -290,11 +206,11 @@ class TimelineLayout(QGridLayout):
     def create_followers_widget(self):
         widget = QGroupBox()
         widget.setObjectName('followers_widget')
-        widget.setMaximumSize(400, 400)
-        widget.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+        widget.setMaximumHeight(400)
+        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         
         layout = QVBoxLayout()
-                
+        
         followers_title = QLabel('Followers:')
         followers_title.setObjectName('followers_title')
         followers_title.setAlignment(Qt.AlignLeft)
@@ -311,30 +227,6 @@ class TimelineLayout(QGridLayout):
             followers_layout.setSpacing(0)
             followers_layout.addWidget(follower_widget)
             
-        follow_input = QLineEdit()
-        follow_input.setObjectName('input_post')
-        follow_input.setPlaceholderText('Username')
-        follow_input.setMaximumWidth(300)
-        follow_input.setAlignment(Qt.AlignLeft)
-        follow_input.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
-        follow_input.textChanged.connect(self.on_search_text_changed)
-        
-        follow_button = QPushButton('Follow')
-        follow_button.setObjectName('create_post_button')
-        follow_button.clicked.connect(self.search)
-        follow_button.setMaximumWidth(100)
-        follow_button.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
-        
-        search_layout = QHBoxLayout()
-        
-        search_layout.setSpacing(0)
-        search_layout.addWidget(follow_input)
-        search_layout.setSpacing(0)
-        search_layout.addWidget(follow_button)
-        
-        followers_layout.setSpacing(0)
-        followers_layout.addLayout(search_layout)
-            
         followers_widget = QGroupBox()
         followers_widget.setObjectName('followers_list')
         followers_widget.setLayout(followers_layout)
@@ -348,6 +240,7 @@ class TimelineLayout(QGridLayout):
         followers_scroll.setWidget(followers_widget)
         
         layout.addWidget(followers_scroll)
+        
         widget.setLayout(layout)
         
         return widget
@@ -355,8 +248,8 @@ class TimelineLayout(QGridLayout):
     def create_following_widget(self):
         widget = QGroupBox()
         widget.setObjectName('following_widget')
-        widget.setMaximumSize(400, 400)
-        widget.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+        widget.setMaximumHeight(400)
+        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         
         layout = QVBoxLayout()
                 
@@ -389,6 +282,30 @@ class TimelineLayout(QGridLayout):
         followers_scroll.setWidget(followers_widget)
         
         layout.addWidget(followers_scroll)
+        
+        follow_input = QLineEdit()
+        follow_input.setObjectName('input_post')
+        follow_input.setPlaceholderText('Username')
+        follow_input.setMaximumWidth(300)
+        follow_input.setAlignment(Qt.AlignLeft)
+        follow_input.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+        follow_input.textChanged.connect(self.on_follow_text_changed)
+        
+        follow_button = QPushButton('Follow')
+        follow_button.setObjectName('create_post_button')
+        follow_button.clicked.connect(self.follow)
+        follow_button.setMaximumWidth(100)
+        follow_button.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+        
+        follow_layout = QHBoxLayout()
+        follow_layout.setAlignment(Qt.AlignLeft)
+        follow_layout.setSpacing(0)
+        follow_layout.addWidget(follow_input)
+        follow_layout.setSpacing(0)
+        follow_layout.addWidget(follow_button)
+        
+        layout.addLayout(follow_layout)
+        
         widget.setLayout(layout)
         
         return widget
