@@ -26,6 +26,7 @@ class PostsDatabase:
         )
 
     def insert_post(self, post_id : int, username : str, body : str):
+        print(post_id, username, body)
         self.connection.execute(
             'INSERT INTO posts (post_id, username, body) VALUES (?, ?, ?);',
             (post_id, username, body)

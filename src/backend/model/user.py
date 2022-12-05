@@ -18,6 +18,8 @@ class User(Node):
         self.database = None
 
         self.info = UserInfo(ip, port, [], [])
+        self.listener = Listener(self.info.ip, self.info.port, self)
+        self.listener.daemon = True
 
         self.stop_ntp = threading.Event()
         self.ntp_thread = EventThread(self.stop_ntp)
@@ -33,9 +35,7 @@ class User(Node):
         """
         Start listening for incoming messages
         """
-        listener = Listener(self.info.ip, self.info.port, self)
-        listener.daemon = True
-        listener.start()
+        self.listener.start()
 
     def stop(self) -> None:
         """
@@ -98,8 +98,38 @@ class User(Node):
         Register the user
         """
         print(f'Registering user {self.username}')
+
+        if await self.get_kademlia_info(self.username) is not None:
+            raise Exception(f'User {self.username} already exists')
+        
         await self.set_kademlia_info(self.username, self.info)
         print(f'User {self.username} registered')
         self.init_database()
 
         return True
+
+    async def login(self) -> None:
+        """
+        Login the user
+        """
+        print(f'Logging in user {self.username}')
+
+        if await self.get_kademlia_info(self.username) is None:
+            raise Exception(f'User {self.username} does not exist')
+
+        self.info = await self.get_kademlia_info(self.username)
+        self.init_database()
+
+        return True
+    
+    def get_followers(self):
+        """
+        Get the followers of the user
+        """
+        return self.info.followers
+    
+    def get_following(self):
+        """
+        Get the users the user is following
+        """
+        return self.info.following

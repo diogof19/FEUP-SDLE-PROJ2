@@ -7,6 +7,7 @@ class Listener(Thread):
         self.ip = ip
         self.port = port
         self.user = user
+        self.view = None
 
     async def request_handler(self, reader, _) -> None:
         """
@@ -34,3 +35,6 @@ class Listener(Thread):
         """
         new_event_loop = asyncio.new_event_loop()
         new_event_loop.run_until_complete(self.serve())
+
+    def set_view(self, view):
+        self.view = view

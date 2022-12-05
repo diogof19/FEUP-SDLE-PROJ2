@@ -21,12 +21,13 @@ class TimelineLayout(QGridLayout):
         header_layout.setContentsMargins(10, 10, 10, 10)
         header_layout.setAlignment(Qt.AlignRight)
         
-        name = QLabel('User1')
+        name = QLabel(self.parent.controller.get_username())
         name.setObjectName('timeline_header_name')
         header_layout.addWidget(name)
         
         logout = QPushButton('Logout')
         logout.setObjectName('timeline_header_logout')
+        logout.clicked.connect(self.logout)
         header_layout.addWidget(logout)
         
         header.setLayout(header_layout)
@@ -187,10 +188,10 @@ class TimelineLayout(QGridLayout):
         return card
     
     def get_all_following(self):
-        return ['User3', 'User4']
+        return self.parent.controller.get_following()
     
     def get_all_followers(self):
-        return ['User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6', 'User6','User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6','User5', 'User6']
+        return self.parent.controller.get_followers()
     
     def on_search_text_changed(self, text):
         self.search_text = text
@@ -205,16 +206,12 @@ class TimelineLayout(QGridLayout):
         
     def unfollow(self, username):
         print('unfollow:', username)
-        
-        #DO UNFOLLOW
-        
+        self.parent.controller.unfollow(username)
         self.parent.reload()
     
     def follow(self, username):
         print('follow:', username)
-        
-        #DO FOLLOW
-        
+        self.parent.controller.follow(username)
         self.parent.reload()
     
     def create_search_widget(self):
@@ -387,8 +384,8 @@ class TimelineLayout(QGridLayout):
     
     def create_post(self):
         print('Create post:', self.post_text)
-        self.reload()
+        self.parent.controller.post(self.post_text)
+        self.parent.reload()
         
-    def reload(self):
-        self.parent.actions()[1].trigger()
-        #super().update()
+    def logout(self):
+        self.parent.setup()
