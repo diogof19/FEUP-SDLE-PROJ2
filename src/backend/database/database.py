@@ -22,6 +22,16 @@ class PostsDatabase:
                 body TEXT NOT NULL,\
                 date TEXT DEFAULT CURRENT_TIMESTAMP,\
                 UNIQUE(post_id, username)\
+            );\
+            CREATE TABLE followers (\
+                id INTEGER PRIMARY KEY AUTOINCREMENT,\
+                username TEXT NOT NULL,\
+                UNIQUE(username)\
+            );\
+            CREATE TABLE following (\
+                id INTEGER PRIMARY KEY AUTOINCREMENT,\
+                username TEXT NOT NULL,\
+                UNIQUE(username)\
             );'
         )
 
@@ -30,6 +40,34 @@ class PostsDatabase:
             'INSERT INTO posts (post_id, username, body) VALUES (?, ?, ?);',
             (post_id, username, body)
         )
+
+    def add_follower(self, username: str):
+        self.connection.execute(
+            'INSERT INTO followers (username) VALUES (?);',
+            (username)
+        )
+
+    def del_follower(self, username: str):
+        pass
+
+    def get_followers(self):
+        self.connection.execute(
+            'SELECT username FROM followers'
+            )
+
+    def add_following(self, username: str):
+        self.connection.execute(
+            'INSERT INTO following (username) VALUES (?);',
+            (username)
+        )
+
+    def del_following(self, username: str):
+        pass
+
+    def get_following(self):
+        self.connection.execute(
+            'SELECT username FROM following'
+            )
 
     def get_posts_for_user(self, username):
         cursor = self.connection.execute(

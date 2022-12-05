@@ -62,6 +62,8 @@ class User(Node):
 
         await self.send_message(new_follow_info.ip, new_follow_info.port, Message.follow_message(self.username))
 
+        self.database.add_following(username)
+
     async def unfollow(self, username : str) -> None:
         """
         Unfollow a user
@@ -78,10 +80,17 @@ class User(Node):
         new_follow_info.followers.remove(self.username)
         self.set_kademlia_info(username, new_follow_info)
 
+        self.database.del_following(username)
+
+
     async def post(self, body : str) -> None:
         """
         Post a message
         """
+
+        if(body.strip() == "" or body == None):
+            return False
+
         self.info.increment_post_id()
         self.database.insert_post(self.info.last_post_id, self.username, body)
         
