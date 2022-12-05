@@ -11,13 +11,15 @@ from comms.sender import Sender
 from os.path import exists, join
 from os import getcwd
 
+from utils.node_utils import run_in_loop
+
 
 class User(Node):
     def __init__(self, ip  : str, port : int, username : str, bootstrap_file : str) -> None:
         super().__init__(ip, port, bootstrap_file)
 
         self.username = username
-
+        self.has_set_own_info = False
         self.database = None
 
         self.info = UserInfo(ip, port, [], [])
@@ -114,7 +116,7 @@ class User(Node):
         if await self.get_kademlia_info(self.username) is not None:
             raise Exception(f'User {self.username} already exists')
         
-        await self.set_kademlia_info(self.username, self.info)
+        self.has_set_own_info = await self.set_kademlia_info(self.username, self.info)
         print(f'User {self.username} registered')
         self.init_database()
 
@@ -151,3 +153,15 @@ class User(Node):
         Get the users the user is following
         """
         return self.info.following
+
+    async def set_own_info(self):
+        """
+        Reset the user's own info
+        """
+        if self.has_set_own_info:
+            return
+        print("Setting own info")
+        while not await self.set_kademlia_info(self.username, self.info):
+            pass
+        self.has_set_own_info = True
+        print("Set own info")

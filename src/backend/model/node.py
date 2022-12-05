@@ -8,6 +8,8 @@ from model.user_info import UserInfo
 from .message import Message
 from comms.sender import Sender
 
+from utils.node_utils import run_in_loop
+
 class Node:
     def __init__(self, ip : str, port : int, bootstrap_file : str) -> None:
         self.setup_logger()
@@ -17,14 +19,15 @@ class Node:
 
         self.connected_nodes = [(node['ip'], node['port']) for node in read_config_file(bootstrap_file) if node['ip'] != ip or node['port'] != port]
 
-        print(self.connected_nodes)
-
         self.loop = asyncio.get_event_loop()
 
         self.server = Server()
         
         self.loop.run_until_complete(self.server.listen(self.port))
         self.loop.run_until_complete(self.server.bootstrap(self.connected_nodes))
+
+        for node in self.connected_nodes:
+            run_in_loop(self.send_message(node[0], node[1], Message.set_own_kademlia_info_message()), self.loop)
 
     def setup_logger(self) -> None:
         if os.getenv('DEBUG'):
@@ -35,7 +38,7 @@ class Node:
         self.loop.run_until_complete(await Sender.send_message(dest_ip, dest_port, message))
 
     async def set_kademlia_info(self, username : str, info : UserInfo) -> None:
-        await self.server.set(username, info.serialize)
+        return await self.server.set(username, info.serialize)
 
     async def get_kademlia_info(self, username : str) -> UserInfo:
         """

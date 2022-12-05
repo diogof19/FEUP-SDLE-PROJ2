@@ -31,6 +31,13 @@ class Controller:
             elif cmd == 'exit':
                 self.user.stop_ntp.set()
                 break
+            elif cmd == 'printKademlia':
+                print(self.user.info)
+            elif cmd == 'get_info':
+                username = input('Enter username: ')
+                print(run_in_loop(self.user.get_kademlia_info(username), self.user.loop).result())
+            elif cmd == 'set_own_info':
+                run_in_loop(self.user.set_own_info(), self.user.loop)
             else:
                 print('Invalid command')
     
@@ -66,4 +73,4 @@ class Controller:
         return self.user.get_following()
     
     def get_username(self):
-        return self.user.username;
+        return self.user.username
