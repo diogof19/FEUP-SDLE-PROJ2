@@ -1,5 +1,6 @@
 import asyncio
 from threading import Thread, Event
+from comms.handlers import postHandler,followHandler
 
 class Listener(Thread):
     def __init__(self, ip : str, port : int, user) -> None:
@@ -14,6 +15,11 @@ class Listener(Thread):
         Handles incoming requests.
         """
         message = await reader.read(-1)
+
+        if(message['message_type'] == 'post'):
+            postHandler(self.user.database, message['post_id'], message['username'], message['body'])
+        elif(message['message_type'] == 'follow'):
+            followHandler()
 
         print(message.decode())
 
