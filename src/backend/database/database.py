@@ -16,24 +16,20 @@ class PostsDatabase:
     def create_tables(self):
         self.connection.execute(
             'CREATE TABLE posts (\
-                id INTEGER PRIMARY KEY AUTOINCREMENT,\
                 post_id INTEGER NOT NULL,\
                 username TEXT NOT NULL,\
                 body TEXT NOT NULL,\
                 date TEXT DEFAULT CURRENT_TIMESTAMP,\
-                UNIQUE(post_id, username)\
-            );\
-            CREATE TABLE followers (\
-                id INTEGER PRIMARY KEY AUTOINCREMENT,\
-                username TEXT NOT NULL,\
-                UNIQUE(username)\
-            );\
-            CREATE TABLE following (\
-                id INTEGER PRIMARY KEY AUTOINCREMENT,\
-                username TEXT NOT NULL,\
-                UNIQUE(username)\
-            );'
-        )
+                PRIMARY KEY(post_id, username)\
+            );')
+        self.connection.execute(
+            'CREATE TABLE followers (\
+                username TEXT PRIMARY KEY NOT NULL\
+            );')
+        self.connection.execute(
+            'CREATE TABLE following (\
+                username TEXT PRIMARY KEY NOT NULL\
+            );')
 
     def insert_post(self, post_id : int, username : str, body : str):
         print(post_id, username, body)
@@ -72,7 +68,7 @@ class PostsDatabase:
 
     def get_posts_for_user(self, username):
         cursor = self.connection.execute(
-            'SELECT * FROM posts WHERE username = ? SORT BY date DESC;',
+            'SELECT * FROM posts WHERE username = ? ORDER BY date DESC;',
             (username,)
         )
 

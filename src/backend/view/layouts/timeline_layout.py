@@ -133,14 +133,8 @@ class TimelineLayout(QGridLayout):
         super().addWidget(info_widget, 1, 2)
         
     def get_all_posts(self):
-        post1 = {'username': 'User11111111111111111111', 'body':'Body text sdasdsdasdasdasdasdasdasdasdasdasdasdsdsdadasdasdasdasdasdsdadasdd', 'date': '2021-01-01'}
-        post2 = {'username': 'User2', 'body':'Body text', 'date': '2021-01-01'}
-        post3 = {'username': 'User2', 'body':'Body text', 'date': '2021-01-01'}
-        post4 = {'username': 'User2', 'body':'Body text', 'date': '2021-01-01'}
-        post5 = {'username': 'User2', 'body':'Body text', 'date': '2021-01-01'}
-        post6 = {'username': 'User2', 'body':'Body text', 'date': '2021-01-01'}
-        
-        return [post1, post2, post3, post4, post5, post6]
+        posts = self.parent.controller.get_posts(self.parent.controller.get_username())
+        return posts
     
     def create_post_card(self, post):
         card = QGroupBox()
@@ -151,12 +145,12 @@ class TimelineLayout(QGridLayout):
         
         layout = QVBoxLayout()
         
-        username = QLabel(post['username'])
+        username = QLabel(post[1])
         username.setObjectName('post_username')
         username.setAlignment(Qt.AlignLeft)
         username.setMargin(0)
         
-        date = QLabel(post['date'])
+        date = QLabel(post[3])
         date.setObjectName('post_date')
         date.setAlignment(Qt.AlignRight)
         date.setMargin(0)
@@ -173,7 +167,7 @@ class TimelineLayout(QGridLayout):
         
         title.setLayout(title_layout)
         
-        body = QLabel(post['body'])
+        body = QLabel(post[2])
         body.setObjectName('post_body')
         body.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         body.setAlignment(Qt.AlignLeft)

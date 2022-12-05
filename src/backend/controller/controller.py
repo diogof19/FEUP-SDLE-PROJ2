@@ -50,8 +50,7 @@ class Controller:
         pass
     
     def get_posts(self, user):
-        pass
-        #self.user.
+        return self.user.database.get_posts_for_user(user)
     
     def unfollow(self, username):
         #TODO: Implement unfollow
