@@ -47,10 +47,6 @@ class TimelineLayout(QGridLayout):
         info_layout.setAlignment(Qt.AlignTop)
         info_layout.setContentsMargins(10, 10, 10, 10)
         
-        search_widget = self.create_search_widget()
-        info_layout.setSpacing(0)
-        info_layout.addWidget(search_widget)
-        
         followers_widget = self.create_followers_widget()
         info_layout.setSpacing(0)
         info_layout.addWidget(followers_widget)
@@ -314,6 +310,30 @@ class TimelineLayout(QGridLayout):
             follower_widget = self.create_follow_widget(follower)
             followers_layout.setSpacing(0)
             followers_layout.addWidget(follower_widget)
+            
+        follow_input = QLineEdit()
+        follow_input.setObjectName('input_post')
+        follow_input.setPlaceholderText('Username')
+        follow_input.setMaximumWidth(300)
+        follow_input.setAlignment(Qt.AlignLeft)
+        follow_input.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+        follow_input.textChanged.connect(self.on_search_text_changed)
+        
+        follow_button = QPushButton('Follow')
+        follow_button.setObjectName('create_post_button')
+        follow_button.clicked.connect(self.search)
+        follow_button.setMaximumWidth(100)
+        follow_button.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+        
+        search_layout = QHBoxLayout()
+        
+        search_layout.setSpacing(0)
+        search_layout.addWidget(follow_input)
+        search_layout.setSpacing(0)
+        search_layout.addWidget(follow_button)
+        
+        followers_layout.setSpacing(0)
+        followers_layout.addLayout(search_layout)
             
         followers_widget = QGroupBox()
         followers_widget.setObjectName('followers_list')
