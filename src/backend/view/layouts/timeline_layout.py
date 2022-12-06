@@ -8,6 +8,7 @@ class TimelineLayout(QGridLayout):
         self.parent = parent
         self.post_text = ""
         self.follow_text = ""
+        self.follow_error_widget = None
         
         super().setContentsMargins(0, 0, 0, 0)
         self.setup()
@@ -191,8 +192,14 @@ class TimelineLayout(QGridLayout):
         self.parent.reload()
     
     def follow(self):
-        self.parent.controller.follow(self.follow_text)
-        self.parent.reload()
+        if not self.parent.controller.follow(self.follow_text):
+            print('follow error')
+            self.follow_error_widget.show()
+        else:
+            print('follow success')
+            self.follow_error_widget.hide()
+            self.parent.reload()
+        
         
     def create_follow_widget(self, follow):
         username = QLabel(follow)
@@ -265,9 +272,20 @@ class TimelineLayout(QGridLayout):
         followers_layout = QVBoxLayout()
         followers = self.get_all_following()
         for follower in followers:
-            follower_widget = self.create_follow_widget(follower)
-            followers_layout.setSpacing(0)
-            followers_layout.addWidget(follower_widget)
+            follower_layout = QHBoxLayout()
+            
+            follower_name = self.create_follow_widget(follower)
+            follower_name.setAlignment(Qt.AlignLeft)
+            
+            unfollow_button = QPushButton('Unfollow')
+            unfollow_button.setObjectName('unfollow_button')
+            unfollow_button.clicked.connect(lambda: self.unfollow(follower))
+            
+            follower_layout.setSpacing(0)
+            follower_layout.addWidget(follower_name)
+            follower_layout.setSpacing(0)
+            follower_layout.addWidget(unfollow_button)
+            
             
         followers_widget = QGroupBox()
         followers_widget.setObjectName('followers_list')
@@ -297,12 +315,19 @@ class TimelineLayout(QGridLayout):
         follow_button.setMaximumWidth(100)
         follow_button.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
         
-        follow_layout = QHBoxLayout()
+        self.follow_error_widget = QLabel('User not found')
+        self.follow_error_widget.setObjectName('follow_error')
+        self.follow_error_widget.setAlignment(Qt.AlignLeft)
+        self.follow_error_widget.hide()
+        
+        follow_layout = QGridLayout()
         follow_layout.setAlignment(Qt.AlignLeft)
         follow_layout.setSpacing(0)
-        follow_layout.addWidget(follow_input)
+        follow_layout.addWidget(follow_input, 0, 0)
         follow_layout.setSpacing(0)
-        follow_layout.addWidget(follow_button)
+        follow_layout.addWidget(follow_button, 0, 1)
+        follow_layout.setSpacing(0)
+        follow_layout.addWidget(self.follow_error_widget, 1, 0, 1, 2)
         
         layout.addLayout(follow_layout)
         
