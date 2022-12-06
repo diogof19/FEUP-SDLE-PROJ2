@@ -4,42 +4,42 @@ import signal
 class Controller:
     def __init__(self, user):
         self.user = user
-        self.stop = False
 
     def start(self):
         """
         Start the controller
-        """        
-        while not self.stop:
-            try:
+        """
+        try:     
+            while True:
                 cmd = input('Enter command: ')
-            except KeyboardInterrupt:
-                self.stop = True
-                break
 
-            if cmd == 'register':
-                self.register()
-            elif cmd == 'post':
-                body = input('Enter message: ')
-                self.post(body)
-            elif cmd == 'follow':
-                run_in_loop(self.user.follow(input("Enter username: ")), self.user.loop)
-            elif cmd == 'unfollow':
-                self.unfollow()
-            elif cmd == 'timeline':
-                self.timeline()
-            elif cmd == 'exit':
-                self.user.stop_ntp.set()
-                break
-            elif cmd == 'printKademlia':
-                print(self.user.info)
-            elif cmd == 'get_info':
-                username = input('Enter username: ')
-                print(run_in_loop(self.user.get_kademlia_info(username), self.user.loop).result())
-            elif cmd == 'set_own_info':
-                run_in_loop(self.user.set_own_info(), self.user.loop)
-            else:
-                print('Invalid command')
+                if cmd == 'register':
+                    self.register()
+                elif cmd == 'post':
+                    body = input('Enter message: ')
+                    self.post(body)
+                elif cmd == 'follow':
+                    run_in_loop(self.user.follow(input("Enter username: ")), self.user.loop)
+                elif cmd == 'unfollow':
+                    self.unfollow()
+                elif cmd == 'timeline':
+                    self.timeline()
+                elif cmd == 'exit':
+                    self.user.stop_ntp.set()
+                    break
+                elif cmd == 'printKademlia':
+                    print(self.user.info)
+                elif cmd == 'get_info':
+                    username = input('Enter username: ')
+                    print(run_in_loop(self.user.get_kademlia_info(username), self.user.loop).result())
+                elif cmd == 'set_own_info':
+                    run_in_loop(self.user.set_own_info(), self.user.loop)
+                else:
+                    print('Invalid command')
+        except KeyboardInterrupt:
+            print('Exiting...')
+            self.user.stop()
+        
     
     def post(self, body):
         print(run_in_loop(self.user.post(body), self.user.loop).result())

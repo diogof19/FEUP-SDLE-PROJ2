@@ -1,7 +1,8 @@
 import sys
-import asyncio
+import os
+import atexit
 import signal
-import sys
+import multiprocessing
 
 from PySide6.QtWidgets import QApplication
 from view.main_window import MainWindow
@@ -13,34 +14,28 @@ from comms import sender
 from comms import listener
 from controller.controller import Controller
 
+import threading
+
 '''
 python main.py -register 'name' 'port'
 python main.py -timeline 'name'
 
 '''
-thread = None
-controller = None
 
 def main():
     peer = User(sys.argv[1], int(sys.argv[2]), '', sys.argv[3])
 
-    serverThread = Thread(target=peer.loop.run_forever, daemon=True)
+    server_thread = Thread(target=peer.loop.run_forever, daemon=True)
 
-    serverThread.start()
+    server_thread.exit = False
+
+    server_thread.start()
 
     controller = Controller(peer)
 
-    controllerThread = Thread(target=controller.start, daemon=True)
+    controller_thread = Thread(target=controller.start, daemon=True)
 
-    controllerThread.start()
-
-    def signal_handler():
-        try:
-            peer.stop_ntp.set()
-        except:
-            pass
-
-    signal.signal(signal.SIGINT, lambda s, f: signal_handler())
+    controller_thread.start()
     
     app = QApplication(sys.argv)
 
@@ -52,7 +47,9 @@ def main():
         _style = f.read()
         timeline_window.setStyleSheet(_style)
 
-    sys.exit(app.exec())
+    app.exec()
+    
+    os._exit(0)
 
 if __name__ == "__main__":
     main()
