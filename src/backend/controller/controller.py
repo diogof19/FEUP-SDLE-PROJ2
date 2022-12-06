@@ -32,12 +32,15 @@ class Controller:
                 self.user.stop_ntp.set()
                 break
             elif cmd == 'missing':
-                self.user.get_missing_posts()
+                self.get_missing()
             elif cmd == 'printKademlia':
                 print(self.user.info)
             elif cmd == 'get_info':
                 username = input('Enter username: ')
                 print(run_in_loop(self.user.get_kademlia_info(username), self.user.loop).result())
+            elif cmd == 'get_posts':
+                username = input('Enter username: ')
+                print(self.get_posts(username))
             elif cmd == 'set_own_info':
                 run_in_loop(self.user.set_own_info(), self.user.loop)
             else:
@@ -67,6 +70,9 @@ class Controller:
     
     def follow(self, username):
         run_in_loop(self.user.follow(username), self.user.loop)
+
+    def get_missing(self):
+        print(run_in_loop(self.user.get_missing_posts(), self.user.loop).result())
     
     def get_followers(self):
         return self.user.get_followers()

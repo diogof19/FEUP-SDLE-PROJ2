@@ -89,11 +89,4 @@ class PostsDatabase:
         
         return cursor.fetchall()
 
-    def get_last_post_id_for_user(self, username):
-        cursor = self.connection.execute(
-            'SELECT id FROM posts WHERE username = ? ORDER BY date ASC;',
-            (username,)
-        )
-        return cursor.fetchall()
-
         

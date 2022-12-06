@@ -45,6 +45,7 @@ class Node:
         Get the kademlia info for a user
         """
         user_info = await self.server.get(username)
+        print(user_info)
         if user_info is None:
             return None
         return UserInfo.deserialize(user_info)

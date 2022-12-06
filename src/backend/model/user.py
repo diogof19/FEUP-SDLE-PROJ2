@@ -103,8 +103,7 @@ class User(Node):
 
         for follower in self.info.followers:
             follower_info = await self.get_kademlia_info(follower)
-            self.send_message(follower_info.ip, follower_info.port, Message.post_message(self.username, self.info.last_post_id, body))
-
+            run_in_loop(self.send_message(follower_info.ip, follower_info.port, Message.post_message(self.username, self.info.last_post_id, body)), self.loop)
         return True
 
     async def register(self) -> None:
@@ -130,16 +129,9 @@ class User(Node):
         missing_posts = []
         print(self.info.following)
         for following in self.info.following:
-            print(await self.get_kademlia_info(following))
-
-            last_following_info = self.database.get_last_post_id_for_user(following)
-            following_posts = self.database.get_posts_for_user(following)
-
-            print(following_posts)
-    
-
-
-
+            following_info = await self.get_kademlia_info(following)
+            print(following_info.last_post_id)  
+            print(self.database.get_posts_for_user(following))
 
     async def login(self) -> None:
         """

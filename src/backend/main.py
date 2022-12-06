@@ -1,10 +1,6 @@
 import sys
 import asyncio
 import signal
-import sys
-
-from PySide6.QtWidgets import QApplication
-from view.main_window import MainWindow
 
 from kademlia.network import Server
 from model.user import User
@@ -22,17 +18,13 @@ thread = None
 controller = None
 
 def main():
-    peer = User(sys.argv[1], int(sys.argv[2]), '', sys.argv[3])
+    peer = User(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4])
 
-    serverThread = Thread(target=peer.loop.run_forever, daemon=True)
+    thread = Thread(target=peer.loop.run_forever, daemon=True)
 
-    serverThread.start()
+    thread.start()
 
     controller = Controller(peer)
-
-    controllerThread = Thread(target=controller.start, daemon=True)
-
-    controllerThread.start()
 
     def signal_handler():
         try:
@@ -41,12 +33,28 @@ def main():
             pass
 
     signal.signal(signal.SIGINT, lambda s, f: signal_handler())
-    
+
+    try:
+        controller.start()
+    except KeyboardInterrupt:
+        pass
+
+if __name__ == "__main__":
+    main() 
+
+"""
+import sys
+
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QApplication
+from view.main_window import MainWindow
+                                                     
+
+if __name__ == "__main__":
+
     app = QApplication(sys.argv)
 
-    timeline_window = MainWindow(controller)
-
-    peer.listener.set_view(timeline_window)
+    timeline_window = MainWindow()
 
     with open("view/layouts/style.qss", "r") as f:
         _style = f.read()
@@ -54,5 +62,4 @@ def main():
 
     sys.exit(app.exec())
 
-if __name__ == "__main__":
-    main()
+    """
