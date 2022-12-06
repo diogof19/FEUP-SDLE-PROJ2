@@ -34,16 +34,21 @@ class PostsDatabase:
                 username TEXT PRIMARY KEY NOT NULL\
             );')
 
-    def insert_post(self, post_id : int, username : str, body : str):
-        print(post_id, username, body)
-        self.connection.execute(
-            'INSERT INTO posts (post_id, username, body) VALUES (?, ?, ?);',
-            (post_id, username, body)
-        )
+    def insert_post(self, post_id : int, username : str, body : str, date : str = None):
+        if date is None:
+            self.connection.execute(
+                'INSERT INTO posts (post_id, username, body) VALUES (?, ?, ?);',
+                (post_id, username, body)
+            )
+        else:
+            self.connection.execute(
+                'INSERT INTO posts (post_id, username, body, date) VALUES (?, ?, ?, ?);',
+                (post_id, username, body, date)
+            )
 
     def add_follower(self, username: str):
         self.connection.execute(
-            'INSERT INTO followers (username) VALUES (?);',
+            'INSERT INTO followers  VALUES (?);',
             (username,)
         )
 
@@ -64,7 +69,7 @@ class PostsDatabase:
 
     def add_following(self, username: str):
         self.connection.execute(
-            'INSERT INTO following (username) VALUES (?);',
+            'INSERT INTO following VALUES (?);',
             (username,)
         )
 
@@ -114,9 +119,9 @@ class PostsDatabase:
             (username,)
         )
 
-        last_post_id = cursor.fetchone()[0]
+        last_post_id = cursor.fetchone()
 
-        return last_post_id if last_post_id is not None else 0
+        return last_post_id[0] if last_post_id[0] is not None else 0
 
     def get_info(self):
         followers = self.get_followers()

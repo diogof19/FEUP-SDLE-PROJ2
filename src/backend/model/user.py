@@ -61,13 +61,10 @@ class User(Node):
         
         self.info.following.append(username)
         await self.set_kademlia_info(self.username, self.info)
-
-        new_follow_info.followers.append(self.username)
-        await self.set_kademlia_info(username, new_follow_info)
+        
+        self.database.add_following(username)
 
         await self.send_message(new_follow_info.ip, new_follow_info.port, Message.follow_message(self.username))
-
-        self.database.add_following(username)
         
         return True
 
