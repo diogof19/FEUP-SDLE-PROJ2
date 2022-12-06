@@ -72,7 +72,8 @@ class User(Node):
     async def unfollow(self, username : str) -> None:
         """
         Unfollow a user
-        TODO: What happens when user is offline?
+        DONE: What happens when user is offline?
+        unfollow is persisted in db and when another post is received 
         """
         new_follow_info = await self.get_kademlia_info(username)
 
