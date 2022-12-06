@@ -19,9 +19,9 @@ class Controller:
                     body = input('Enter message: ')
                     self.post(body)
                 elif cmd == 'follow':
-                    run_in_loop(self.user.follow(input("Enter username: ")), self.user.loop)
+                    self.follow(input("Enter username: "))
                 elif cmd == 'unfollow':
-                    self.unfollow()
+                    self.unfollow(input("Enter username: "))
                 elif cmd == 'timeline':
                     self.timeline()
                 elif cmd == 'exit':
@@ -61,7 +61,11 @@ class Controller:
         return posts
     
     def unfollow(self, username):
-        run_in_loop(self.user.unfollow(username), self.user.loop).result()
+        try:
+            run_in_loop(self.user.unfollow(username), self.user.loop).result()
+            return True
+        except Exception as e:
+            return False
     
     def follow(self, username):
         try:

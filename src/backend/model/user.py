@@ -19,7 +19,6 @@ class User(Node):
         super().__init__(ip, port, bootstrap_file)
 
         self.username = username
-        self.has_set_own_info = False
         self.database = None
 
         self.info = UserInfo(ip, port, [], [])
@@ -74,18 +73,16 @@ class User(Node):
         DONE: What happens when user is offline?
         unfollow is persisted in db and when another post is received 
         """
-        new_follow_info = await self.get_kademlia_info(username)
+        unfollow_info = await self.get_kademlia_info(username)
 
-        if new_follow_info is None:
+        if unfollow_info is None:
             raise Exception(f'User {username} not found')
         
         self.info.following.remove(username)
-        self.set_kademlia_info(self.username, self.info)
-
-        new_follow_info.followers.remove(self.username)
-        self.set_kademlia_info(username, new_follow_info)
-
+        await self.set_kademlia_info(self.username, self.info)
         self.database.del_following(username)
+
+        await self.send_message(unfollow_info.ip, unfollow_info.port, Message.unfollow_message(self.username))
 
 
     async def post(self, body : str) -> None:
@@ -117,7 +114,7 @@ class User(Node):
         if await self.get_kademlia_info(self.username) is not None:
             raise Exception(f'User {self.username} already exists')
         
-        self.has_set_own_info = await self.set_kademlia_info(self.username, self.info)
+        await self.set_kademlia_info(self.username, self.info)
         print(f'User {self.username} registered')
         self.init_database()
 
@@ -134,14 +131,14 @@ class User(Node):
         if own_kademlia_info is not None:
             info = own_kademlia_info
             self.info = UserInfo(self.ip, self.port, info.followers, info.following, info.last_post_id)
-            self.has_set_own_info = await self.set_kademlia_info(self.username, self.info)
+            await self.set_kademlia_info(self.username, self.info)
             self.init_database()
             return True
         elif exists(join(getcwd(), 'database', 'db', f'{self.username}.db')):
             self.init_database()
             info = self.database.get_info()
             self.info = UserInfo(self.ip, self.port, info['followers'], info['following'], info['last_post_id'])
-            self.has_set_own_info = await self.set_kademlia_info(self.username, self.info)
+            await self.set_kademlia_info(self.username, self.info)
             return True
 
         print(f'User {self.username} not found')
@@ -164,8 +161,6 @@ class User(Node):
         """
         Reset the user's own info
         """
-        if self.has_set_own_info:
-            return
         print("Setting own info")
         while not await self.set_kademlia_info(self.username, self.info):
             pass

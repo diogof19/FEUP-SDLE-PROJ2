@@ -22,11 +22,11 @@ class Listener(Thread):
         print(f"Received message: {message}")
         
         if(message['message_type'] == 'post'):
-            post_handler(self.user.database, message['post_id'], message['username'], message['body'], message['date'])
+            await post_handler(self.user.database, message['post_id'], message['username'], message['body'], message['date'], self.user)
         elif(message['message_type'] == 'follow'):
-            follow_handler(self.user.database, message['username'], self.user)
+            await follow_handler(self.user.database, message['username'], self.user)
         elif(message['message_type'] == 'unfollow'):
-            unfollow_handler(self.user.database, message['username'])
+            await unfollow_handler(self.user.database, message['username'], self.user)
         elif (message['message_type'] == 'set_own_kademlia_info'):
             set_own_kademlia_info_handler(self.user)
 
