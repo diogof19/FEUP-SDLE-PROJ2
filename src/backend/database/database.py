@@ -59,7 +59,6 @@ class PostsDatabase:
             )
 
         followers = cursor.fetchall()
-        print('followers', followers)
 
         return [follower[0] for follower in followers]
 
@@ -82,7 +81,6 @@ class PostsDatabase:
             )
         
         following = cursor.fetchall()
-        print('following', following)
 
         return [follow[0] for follow in following]
 
