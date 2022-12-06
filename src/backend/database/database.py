@@ -62,7 +62,7 @@ class PostsDatabase:
         followers = cursor.fetchall()
         print('followers', followers)
 
-        return followers
+        return [follower[0] for follower in followers]
 
     def add_following(self, username: str):
         self.connection.execute(
@@ -85,7 +85,7 @@ class PostsDatabase:
         following = cursor.fetchall()
         print('following', following)
 
-        return following
+        return [follow[0] for follow in following]
 
     def get_posts_for_user(self, username):
         cursor = self.connection.execute(
@@ -109,7 +109,9 @@ class PostsDatabase:
             (username,)
         )
 
-        return cursor.fetchone()[0]
+        last_post_id = cursor.fetchone()[0]
+
+        return last_post_id if last_post_id is not None else 0
 
     def get_info(self):
         followers = self.get_followers()
@@ -121,6 +123,7 @@ class PostsDatabase:
             'following': following,
             'last_post_id': last_post_id
         }
+
     def is_following(self, username):
         cursor = self.connection.execute(
             'SELECT * FROM following WHERE username = ?;',
