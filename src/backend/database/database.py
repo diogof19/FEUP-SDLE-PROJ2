@@ -3,10 +3,13 @@ import sqlite3
 from os.path import exists, join
 from os import getcwd
 
+from model.user_info import UserInfo
+
 class PostsDatabase:
     def __init__(self, username):
         self.db_path = join(getcwd(), 'database', 'db', f'{username}.db')
         exists_db = exists(self.db_path)
+        self.username = username
 
         self.connection = sqlite3.connect(self.db_path, check_same_thread=False, isolation_level=None)
 
@@ -51,9 +54,14 @@ class PostsDatabase:
         )
 
     def get_followers(self):
-        self.connection.execute(
+        cursor = self.connection.execute(
             'SELECT username FROM followers;'
             )
+
+        followers = cursor.fetchall()
+        print('followers', followers)
+
+        return followers
 
     def add_following(self, username: str):
         self.connection.execute(
@@ -69,9 +77,14 @@ class PostsDatabase:
         self.del_posts_for_user(username)
 
     def get_following(self):
-        self.connection.execute(
+        cursor = self.connection.execute(
             'SELECT username FROM following'
             )
+        
+        following = cursor.fetchall()
+        print('following', following)
+
+        return following
 
     def get_posts_for_user(self, username):
         cursor = self.connection.execute(
@@ -88,3 +101,22 @@ class PostsDatabase:
         )
 
         return cursor.fetchall()
+
+    def get_max_post_id_for_username(self, username):
+        cursor = self.connection.execute(
+            'SELECT MAX(post_id) FROM posts WHERE username = ?;',
+            (username,)
+        )
+
+        return cursor.fetchone()[0]
+
+    def get_info(self):
+        followers = self.get_followers()
+        following = self.get_following()
+        last_post_id = self.get_max_post_id_for_username(self.username)
+
+        return {
+            'followers': followers,
+            'following': following,
+            'last_post_id': last_post_id
+        }

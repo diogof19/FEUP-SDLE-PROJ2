@@ -128,19 +128,24 @@ class User(Node):
         """
         print(f'Logging in user {self.username}')
 
-        user_exists = True
-        if await self.get_kademlia_info(self.username) is None:
-            user_exists = False
-        elif not exists(join(getcwd(), 'database', 'db', f'{self.username}.db')):
-            user_exists = True
-            
-        if not user_exists:
-            raise Exception(f'User {self.username} does not exist')
+        own_kademlia_info = await self.get_kademlia_info(self.username)
+        
+        if own_kademlia_info is not None:
+            info = own_kademlia_info
+            self.info = UserInfo(self.ip, self.port, info.followers, info.following, info.last_post_id)
+            self.has_set_own_info = await self.set_kademlia_info(self.username, self.info)
+            self.init_database()
+            return True
+        elif exists(join(getcwd(), 'database', 'db', f'{self.username}.db')):
+            self.init_database()
+            info = self.database.get_info()
+            self.info = UserInfo(self.ip, self.port, info['followers'], info['following'], info['last_post_id'])
+            self.has_set_own_info = await self.set_kademlia_info(self.username, self.info)
+            return True
 
-        self.info = await self.get_kademlia_info(self.username)
-        self.init_database()
+        print(f'User {self.username} not found')
 
-        return True
+        return False
     
     def get_followers(self):
         """
