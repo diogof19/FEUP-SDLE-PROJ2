@@ -17,7 +17,7 @@ python main.py -timeline 'name'
 thread = None
 controller = None
 
-""" def main():
+def main():
     peer = User(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4])
 
     thread = Thread(target=peer.loop.run_forever, daemon=True)
@@ -40,9 +40,9 @@ controller = None
         pass
 
 if __name__ == "__main__":
-    main() """
+    main() 
 
-
+"""
 import sys
 
 from PySide6.QtCore import Qt
@@ -61,3 +61,5 @@ if __name__ == "__main__":
         timeline_window.setStyleSheet(_style)
 
     sys.exit(app.exec())
+
+    """

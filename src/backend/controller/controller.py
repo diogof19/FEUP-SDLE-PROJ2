@@ -32,5 +32,7 @@ class Controller:
             elif cmd == 'exit':
                 self.user.stop_ntp.set()
                 break
+            elif cmd == 'missing':
+                self.user.get_missing_posts()
             else:
                 print('Invalid command')

@@ -8,7 +8,6 @@ from database.database import PostsDatabase
 from comms.listener import Listener
 from comms.sender import Sender
 
-
 class User(Node):
     def __init__(self, ip  : str, port : int, username : str, bootstrap_file : str) -> None:
         super().__init__(ip, port, bootstrap_file)
@@ -103,3 +102,22 @@ class User(Node):
         self.init_database()
 
         return True
+    
+    async def get_missing_posts(self) -> None:
+        """
+        Get the missing posts from the database
+        Since the previous last_post_id to the current last_post_id
+        """
+        missing_posts = []
+        print(self.info.following)
+        for following in self.info.following:
+            print(await self.get_kademlia_info(following))
+
+            last_following_info = self.database.get_last_post_id_for_user(following)
+            following_posts = self.database.get_posts_for_user(following)
+
+            print(following_posts)
+    
+
+
+

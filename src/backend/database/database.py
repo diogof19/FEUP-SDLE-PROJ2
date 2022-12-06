@@ -33,8 +33,17 @@ class PostsDatabase:
 
     def get_posts_for_user(self, username):
         cursor = self.connection.execute(
-            'SELECT * FROM posts WHERE username = ? SORT BY date DESC;',
+            'SELECT * FROM posts WHERE username = ? ORDER BY date DESC;',
             (username,)
         )
-
+        
         return cursor.fetchall()
+
+    def get_last_post_id_for_user(self, username):
+        cursor = self.connection.execute(
+            'SELECT id FROM posts WHERE username = ? ORDER BY date ASC;',
+            (username,)
+        )
+        return cursor.fetchall()
+
+        

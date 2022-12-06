@@ -34,4 +34,4 @@ class UserInfo:
             user_info_json["port"],
             user_info_json["followers"],
             user_info_json["following"]
-        )
+        )    
