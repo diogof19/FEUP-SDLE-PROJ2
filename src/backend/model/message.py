@@ -1,6 +1,12 @@
 import json
 
 class Message:
+
+    @staticmethod
+    def parse_message(message: str):
+        message.strip()
+        return json.loads(message)
+
     @staticmethod
     def create_message(username : str, message_type : str, args : dict) -> str:
         """
@@ -30,3 +36,10 @@ class Message:
         Create a post message
         """
         return Message.create_message(username, 'post', {'post_id': post_id, 'body': body})
+
+    @staticmethod
+    def set_own_kademlia_info_message() -> str:
+        """
+        Create a set own kademlia info message
+        """
+        return Message.create_message('', 'set_own_kademlia_info', {})

@@ -7,8 +7,9 @@ from ..consts import WINDOW_BACKGROUND_COLOR, WINDOW_COLOR, HIGHLIGHT_COLOR
 class StartLayout(QHBoxLayout):
     def __init__(self, parent):
         super().__init__()
-        self.setup()
         self.parent = parent
+        self.username = ""
+        self.setup()
 
     def setup(self):
         # Left side
@@ -31,24 +32,17 @@ class StartLayout(QHBoxLayout):
         username_field = QLineEdit()
         username_field.setObjectName('username_field')
         username_field.setPlaceholderText("Username")
+        username_field.textChanged.connect(self.username_changed)
 
         horizontal_layout = QHBoxLayout()
         
         login_button = QPushButton('Login')
         login_button.setObjectName('login_button')
-        login_button.setToolTip('This s an example login_button')
         login_button.clicked.connect(self.login)
 
         register_button = QPushButton('Register')
-        register_button.setObjectName('register_button') 
-        register_button.setToolTip('This s an example register_button')
+        register_button.setObjectName('register_button')
         register_button.clicked.connect(self.register)
-        
-        
-        """ card.addWidget(username_field)
-        card.addWidget(login_button)
-        card.addWidget(register_button) """
-        
         
         horizontal_layout.addWidget(register_button)
         horizontal_layout.addWidget(login_button)
@@ -66,19 +60,13 @@ class StartLayout(QHBoxLayout):
         right_side.addWidget(QWidget())
 
         vertical_layout.addLayout(right_side)
-        #self.addWidget(title)
-        #self.addWidget(card)
         self.addLayout(vertical_layout)
-        #self.addLayout(vertical_layout)
-        #self.addLayout(left_side)
-        #self.addLayout(right_side)
     
-    
-    @Slot()
     def login(self):
-        print('PyQt5 login_button click')
-        self.parent.actions()[0].trigger()
+        self.parent.login(self.username)
 
-    @Slot()
     def register(self):
-        print('PyQt5 register_button click')
+        self.parent.register(self.username)
+        
+    def username_changed(self, text):
+        self.username = text

@@ -16,24 +16,74 @@ class PostsDatabase:
     def create_tables(self):
         self.connection.execute(
             'CREATE TABLE posts (\
-                id INTEGER PRIMARY KEY AUTOINCREMENT,\
                 post_id INTEGER NOT NULL,\
                 username TEXT NOT NULL,\
                 body TEXT NOT NULL,\
                 date TEXT DEFAULT CURRENT_TIMESTAMP,\
-                UNIQUE(post_id, username)\
-            );'
-        )
+                PRIMARY KEY(post_id, username)\
+            );')
+        self.connection.execute(
+            'CREATE TABLE followers (\
+                username TEXT PRIMARY KEY NOT NULL\
+            );')
+        self.connection.execute(
+            'CREATE TABLE following (\
+                username TEXT PRIMARY KEY NOT NULL\
+            );')
 
     def insert_post(self, post_id : int, username : str, body : str):
+        print(post_id, username, body)
         self.connection.execute(
             'INSERT INTO posts (post_id, username, body) VALUES (?, ?, ?);',
             (post_id, username, body)
         )
 
+    def add_follower(self, username: str):
+        self.connection.execute(
+            'INSERT INTO followers (username) VALUES (?);',
+            (username,)
+        )
+
+    def del_follower(self, username: str):
+        self.connection.execute(
+            'DELETE FROM followers WHERE username == ?;',
+            (username,)
+        )
+
+    def get_followers(self):
+        self.connection.execute(
+            'SELECT username FROM followers;'
+            )
+
+    def add_following(self, username: str):
+        self.connection.execute(
+            'INSERT INTO following (username) VALUES (?);',
+            (username,)
+        )
+
+    def del_following(self, username: str):
+        self.connection.execute(
+            'DELETE FROM following WHERE username == ?;',
+            (username,)
+        )        
+        self.del_posts_for_user(username)
+
+    def get_following(self):
+        self.connection.execute(
+            'SELECT username FROM following'
+            )
+
     def get_posts_for_user(self, username):
         cursor = self.connection.execute(
             'SELECT * FROM posts WHERE username = ? ORDER BY date DESC;',
+            (username,)
+        )
+
+        return cursor.fetchall()
+
+    def del_posts_for_user(self, username):
+        cursor = self.connection.execute(
+            'DELETE FROM posts WHERE username = ?;',
             (username,)
         )
         

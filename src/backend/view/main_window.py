@@ -6,14 +6,17 @@ from .consts import WINDOW_BACKGROUND_COLOR, WINDOW_COLOR, HIGHLIGHT_COLOR
 from .layouts.start_layout import StartLayout
 from .layouts.timeline_layout import TimelineLayout
 
+from model.user import User
+
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, controller):
         super().__init__()
         self.title = 'Singer'
         self.left = 100
         self.top = 100
         self.width = 640
         self.height = 480
+        self.controller = controller
         self.setup()
         
     def setup(self):
@@ -23,14 +26,6 @@ class MainWindow(QMainWindow):
             background-color: {WINDOW_BACKGROUND_COLOR};\
             color: {WINDOW_COLOR};\
         ')
-        
-        login_action = QWidgetAction(self)
-        login_action.triggered.connect(self.login)
-        self.addAction(login_action)
-        
-        reload_action = QWidgetAction(self)
-        reload_action.triggered.connect(self.reload)
-        self.addAction(reload_action)
         
         layout = StartLayout(self)
 
@@ -42,8 +37,26 @@ class MainWindow(QMainWindow):
 
         self.show()
         
-    def login(self):
-        print("Login in parent")
+    def login(self, username):
+        print("Logging in as", username)
+        self.controller.user.username = username
+        self.controller.login()
+        
+        layout = TimelineLayout(self)
+        layout.setAlignment(Qt.AlignTop)
+        
+        widget = QWidget()
+        widget.width = 400
+        widget.setLayout(layout)
+
+        self.setCentralWidget(widget)
+
+        self.show()
+        
+    def register(self, username):
+        print("Registering as", username)
+        self.controller.user.username = username
+        self.controller.register()
         
         layout = TimelineLayout(self)
         layout.setAlignment(Qt.AlignTop)
@@ -70,13 +83,10 @@ class MainWindow(QMainWindow):
 
         self.show()
         
-    def do_search(self, text):
-        print('Searching:', text)
+    def logout(self):
+        print("Logout")
         
-        #GET SEARCH RESULTS
-        search_results = ['User1', 'User2', 'User3']
-        
-        layout = TimelineLayout(self, search_results=search_results)
+        layout = StartLayout(self)
         layout.setAlignment(Qt.AlignTop)
         
         widget = QWidget()
