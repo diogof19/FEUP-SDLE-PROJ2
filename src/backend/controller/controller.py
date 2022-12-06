@@ -58,7 +58,6 @@ class Controller:
     
     def get_posts(self, user):
         posts = self.user.database.get_posts()
-        print('posts:', posts)
         return posts
     
     def unfollow(self, username):

@@ -29,8 +29,6 @@ class Listener(Thread):
             unfollowHandler(self.user.database, message['username'])
         elif (message['message_type'] == 'set_own_kademlia_info'):
             set_own_kademlia_info_handler(self.user)
-            
-        self.view.reload()
 
     async def serve(self):
         """
