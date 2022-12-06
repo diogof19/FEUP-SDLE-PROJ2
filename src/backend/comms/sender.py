@@ -9,6 +9,7 @@ class Sender:
             writer.write(message.encode())
             await writer.drain()
             writer.close()
+            print(f'Sent message to {ip}:{port} ({message})')
             return True
         except Exception as _:
             return False

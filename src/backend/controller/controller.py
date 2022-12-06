@@ -57,7 +57,9 @@ class Controller:
         pass
     
     def get_posts(self, user):
-        return self.user.database.get_posts_for_user(user)
+        posts = self.user.database.get_posts()
+        print('posts:', posts)
+        return posts
     
     def unfollow(self, username):
         run_in_loop(self.user.unfollow(username), self.user.loop).result()
