@@ -55,7 +55,7 @@ class User(Node):
         TODO: What happens when user is offline?
         """
         new_follow_info = await self.get_kademlia_info(username)
-
+        
         if new_follow_info is None:
             raise Exception(f'User {username} not found')
         
@@ -68,11 +68,14 @@ class User(Node):
         await self.send_message(new_follow_info.ip, new_follow_info.port, Message.follow_message(self.username))
 
         self.database.add_following(username)
+        
+        return True
 
     async def unfollow(self, username : str) -> None:
         """
         Unfollow a user
-        TODO: What happens when user is offline?
+        DONE: What happens when user is offline?
+        unfollow is persisted in db and when another post is received 
         """
         new_follow_info = await self.get_kademlia_info(username)
 

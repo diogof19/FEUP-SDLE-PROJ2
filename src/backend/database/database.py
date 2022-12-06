@@ -31,7 +31,8 @@ class PostsDatabase:
             );')
         self.connection.execute(
             'CREATE TABLE following (\
-                username TEXT PRIMARY KEY NOT NULL\
+                username TEXT PRIMARY KEY NOT NULL,\
+                was_notified BIT NOT NULL\
             );')
 
     def insert_post(self, post_id : int, username : str, body : str):
@@ -88,7 +89,7 @@ class PostsDatabase:
 
     def get_posts_for_user(self, username):
         cursor = self.connection.execute(
-            'SELECT * FROM posts WHERE username = ? ORDER BY date DESC;',
+            'SELECT * FROM followers WHERE username = ?;',
             (username,)
         )
 
@@ -120,3 +121,12 @@ class PostsDatabase:
             'following': following,
             'last_post_id': last_post_id
         }
+    def is_following(self, username):
+        cursor = self.connection.execute(
+            'SELECT * FROM following WHERE username = ?;',
+            (username,)
+        )
+        if cursor.fetchone() is None:
+            return False
+        else:
+            return True

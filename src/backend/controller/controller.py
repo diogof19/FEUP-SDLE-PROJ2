@@ -60,11 +60,14 @@ class Controller:
         return self.user.database.get_posts_for_user(user)
     
     def unfollow(self, username):
-        #TODO: Implement unfollow
-        pass
+        run_in_loop(self.user.unfollow(username), self.user.loop).result()
     
     def follow(self, username):
-        run_in_loop(self.user.follow(username), self.user.loop)
+        try:
+            run_in_loop(self.user.follow(username), self.user.loop).result()
+            return True
+        except Exception as e:
+            return False
     
     def get_followers(self):
         return self.user.get_followers()
