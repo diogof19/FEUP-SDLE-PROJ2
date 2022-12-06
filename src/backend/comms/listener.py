@@ -22,9 +22,9 @@ class Listener(Thread):
         print(f"Received message: {message}")
         
         if(message['message_type'] == 'post'):
-            postHandler(self.user.database, message['post_id'], message['username'], message['body'])
+            postHandler(self.user.database, message['post_id'], message['username'], message['body'], message['date'])
         elif(message['message_type'] == 'follow'):
-            followHandler(self.user.database, message['username'])
+            followHandler(self.user.database, message['username'], self.user)
         elif(message['message_type'] == 'unfollow'):
             unfollowHandler(self.user.database, message['username'])
         elif (message['message_type'] == 'set_own_kademlia_info'):

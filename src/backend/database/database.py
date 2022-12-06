@@ -28,8 +28,7 @@ class PostsDatabase:
             );')
         self.connection.execute(
             'CREATE TABLE following (\
-                username TEXT PRIMARY KEY NOT NULL,\
-                was_notified BIT NOT NULL\
+                username TEXT PRIMARY KEY NOT NULL\
             );')
 
     def insert_post(self, post_id : int, username : str, body : str):
@@ -76,10 +75,17 @@ class PostsDatabase:
 
     def get_posts_for_user(self, username):
         cursor = self.connection.execute(
-            'SELECT * FROM followers WHERE username = ?;',
+            'SELECT * FROM posts WHERE username = ? ORDER BY date DESC;',
             (username,)
         )
 
+        return cursor.fetchall()
+    
+    def get_posts(self):
+        cursor = self.connection.execute(
+            'SELECT * FROM posts ORDER BY date DESC;'
+        )
+        
         return cursor.fetchall()
 
     def del_posts_for_user(self, username):
@@ -89,7 +95,7 @@ class PostsDatabase:
         )
 
         return cursor.fetchall()
-
+    
     def is_following(self, username):
         cursor = self.connection.execute(
             'SELECT * FROM following WHERE username = ?;',
@@ -99,3 +105,10 @@ class PostsDatabase:
             return False
         else:
             return True
+
+    def get_date(self, post_id):
+        cursor = self.connection.execute(
+            'SELECT date FROM posts WHERE post_id = ?;',
+            (post_id,)
+        )
+        return cursor.fetchone()[0]

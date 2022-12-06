@@ -31,11 +31,11 @@ class Message:
         return Message.create_message(username, 'unfollow', {})
 
     @staticmethod
-    def post_message(username : str, post_id : int, body : str) -> str:
+    def post_message(username : str, post_id : int, body : str, date : str) -> str:
         """
         Create a post message
         """
-        return Message.create_message(username, 'post', {'post_id': post_id, 'body': body})
+        return Message.create_message(username, 'post', {'post_id': post_id, 'body': body, 'date': date})
 
     @staticmethod
     def set_own_kademlia_info_message() -> str:
