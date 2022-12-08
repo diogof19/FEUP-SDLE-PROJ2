@@ -56,7 +56,7 @@ class User(Node):
         new_follow_info = await self.get_kademlia_info(username)
         
         if new_follow_info is None:
-            raise Exception(f'User {username} not found')
+            return None
         
         self.info.following.append(username)
         await self.set_kademlia_info(self.username, self.info)

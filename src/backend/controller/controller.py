@@ -19,7 +19,7 @@ class Controller:
                     body = input('Enter message: ')
                     self.post(body)
                 elif cmd == 'follow':
-                    self.follow(input("Enter username: "))
+                    print(self.follow(input("Enter username: ")))
                 elif cmd == 'unfollow':
                     self.unfollow(input("Enter username: "))
                 elif cmd == 'timeline':
@@ -69,11 +69,13 @@ class Controller:
     
     def follow(self, username):
         try:
-            run_in_loop(self.user.follow(username), self.user.loop).result()
-            return True
+            return run_in_loop(self.user.follow(username), self.user.loop).result()
         except Exception as e:
-            return False
-    
+            if(str(e) == 'This event loop is already running'):
+                return True
+            else:
+                return False
+        
     def get_followers(self):
         return self.user.get_followers()
     

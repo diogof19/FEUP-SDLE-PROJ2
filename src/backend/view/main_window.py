@@ -33,11 +33,12 @@ class MainWindow(QMainWindow):
         self.width = 640
         self.height = 480
         self.controller = controller
+        self.timeline_layout = None
         self.setup()
 
         self.threadpool = QThreadPool()
         self.updater = Updater()
-        self.updater.signals.signal.connect(self.reload)
+        self.updater.signals.signal.connect(self.update)
         self.threadpool.start(self.updater)
         
     def setup(self):
@@ -64,12 +65,12 @@ class MainWindow(QMainWindow):
         self.controller.login()
         self.logged_in = True
         
-        layout = TimelineLayout(self)
-        layout.setAlignment(Qt.AlignTop)
+        self.timeline_layout = TimelineLayout(self)
+        self.timeline_layout.setAlignment(Qt.AlignTop)
         
         widget = QWidget()
         widget.width = 400
-        widget.setLayout(layout)
+        widget.setLayout(self.timeline_layout)
 
         self.setCentralWidget(widget)
 
@@ -81,12 +82,12 @@ class MainWindow(QMainWindow):
         self.controller.register()
         self.logged_in = True
 
-        layout = TimelineLayout(self)
-        layout.setAlignment(Qt.AlignTop)
+        self.timeline_layout = TimelineLayout(self)
+        self.timeline_layout.setAlignment(Qt.AlignTop)
         
         widget = QWidget()
         widget.width = 400
-        widget.setLayout(layout)
+        widget.setLayout(self.timeline_layout)
 
         self.setCentralWidget(widget)
 
@@ -96,12 +97,12 @@ class MainWindow(QMainWindow):
         if not self.logged_in: 
             return
         
-        layout = TimelineLayout(self)
-        layout.setAlignment(Qt.AlignTop)
+        self.timeline_layout = TimelineLayout(self)
+        self.timeline_layout.setAlignment(Qt.AlignTop)
         
         widget = QWidget()
         widget.width = 400
-        widget.setLayout(layout)
+        widget.setLayout(self.timeline_layout)
 
         self.setCentralWidget(widget)
 
@@ -120,3 +121,9 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
         self.show()
+        
+    def update(self):
+        if self.timeline_layout != None:
+            self.timeline_layout.update_posts()
+            self.timeline_layout.update_followers()
+            self.timeline_layout.update_following()

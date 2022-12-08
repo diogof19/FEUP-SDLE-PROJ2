@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QVBoxLayout, QFrame, QGridLayout, QHBoxLayout, QLabel, QGroupBox, QSizePolicy, QScrollArea, QLineEdit, QPushButton
+from PySide6.QtWidgets import QVBoxLayout, QFrame, QGridLayout, QHBoxLayout, QLabel, QGroupBox, QSizePolicy, QScrollArea, QLineEdit, QPushButton, QStackedWidget
 from PySide6.QtCore import Slot, Qt, QSize
 from PySide6 import QtWidgets
 
@@ -9,6 +9,9 @@ class TimelineLayout(QGridLayout):
         self.post_text = ""
         self.follow_text = ""
         self.follow_error_widget = None
+        self.stacked_posts = None
+        self.stacked_followers = None
+        self.stacked_following = None
         
         super().setContentsMargins(0, 0, 0, 0)
         self.setup()
@@ -32,28 +35,22 @@ class TimelineLayout(QGridLayout):
         
         header.setLayout(header_layout)
         
-        # ------------------ Posts ------------------
-        
-        posts_layout = QVBoxLayout()
-        
-        posts = self.get_all_posts()
-        for post in posts:
-            card = self.create_post_card(post)
-            posts_layout.addWidget(card)
-            
         # ----------------- Info Area -----------------
         
         info_layout = QVBoxLayout()
         info_layout.setAlignment(Qt.AlignTop)
         info_layout.setContentsMargins(10, 10, 10, 10)
         
-        followers_widget = self.create_followers_widget()
+        self.followers_widget = self.create_followers_widget()
         info_layout.setSpacing(0)
-        info_layout.addWidget(followers_widget)
+        info_layout.addWidget(self.followers_widget)
         
         following_widget = self.create_following_widget()
         info_layout.setSpacing(15)
-        info_layout.addWidget(following_widget)
+        
+        self.stacked_following = QStackedWidget()
+        self.stacked_following.addWidget(following_widget)
+        info_layout.addWidget(self.stacked_following)
         
         info_widget = QGroupBox()
         info_widget.setObjectName('info_widget')
@@ -69,9 +66,10 @@ class TimelineLayout(QGridLayout):
         
         # ----------------- Posts Scroll ----------------- #
         
-        posts_widget = QtWidgets.QWidget()
-        posts_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
-        posts_widget.setLayout(posts_layout)
+        posts_widget = self.create_posts_widget()
+        
+        self.stacked_posts = QStackedWidget()
+        self.stacked_posts.addWidget(posts_widget)
         
         scroll_posts = QScrollArea()
         scroll_posts.setMaximumWidth(1200)
@@ -80,7 +78,7 @@ class TimelineLayout(QGridLayout):
         scroll_posts.setViewportMargins(0, 0, 0, 0)
         scroll_posts.setObjectName('scroll_posts')
         scroll_posts.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
-        scroll_posts.setWidget(posts_widget)
+        scroll_posts.setWidget(self.stacked_posts)
         
         # ----------------- Create Posts ----------------- #
         
@@ -94,6 +92,7 @@ class TimelineLayout(QGridLayout):
         create_post_button = QPushButton('Create Post')
         create_post_button.setObjectName('create_post_button')
         create_post_button.clicked.connect(self.create_post)
+        create_post_button.clicked.connect(lambda: input_post.clear())
         create_post_button.setFixedWidth(200)
         
         create_post_layout = QHBoxLayout()
@@ -131,6 +130,22 @@ class TimelineLayout(QGridLayout):
     def get_all_posts(self):
         posts = self.parent.controller.get_posts(self.parent.controller.get_username())
         return posts
+    
+    def create_posts_widget(self):
+        posts_layout = QVBoxLayout()
+        posts_layout.setAlignment(Qt.AlignTop)
+        
+        posts = self.get_all_posts()
+        for post in posts:
+            card = self.create_post_card(post)
+            posts_layout.setSpacing(10)
+            posts_layout.addWidget(card)
+            
+        posts_widget = QtWidgets.QWidget()
+        posts_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
+        posts_widget.setLayout(posts_layout)
+        
+        return posts_widget
     
     def create_post_card(self, post):
         card = QGroupBox()
@@ -191,14 +206,26 @@ class TimelineLayout(QGridLayout):
         self.parent.controller.unfollow(username)
         self.parent.reload()
     
+    def update_following(self):
+        if self.stacked_following != None:
+            following = self.create_following_widget()
+            self.stacked_following.removeWidget(self.stacked_following.currentWidget())
+            self.stacked_following.addWidget(following)
+        self.stacked_following.setCurrentWidget(following)
+        
+    def update_followers(self):
+        if self.stacked_followers != None:
+            followers = self.create_followers_widget()
+            self.stacked_followers.removeWidget(self.stacked_followers.currentWidget())
+            self.stacked_followers.addWidget(followers)
+            self.stacked_followers.setCurrentWidget(followers)
+        
     def follow(self):
         if not self.parent.controller.follow(self.follow_text):
-            print('follow error')
             self.follow_error_widget.show()
         else:
-            print('follow success')
             self.follow_error_widget.hide()
-            self.parent.reload()
+            self.update_following()
         
         
     def create_follow_widget(self, follow):
@@ -338,10 +365,18 @@ class TimelineLayout(QGridLayout):
     def on_post_text_changed(self, text):
         self.post_text = text
     
+    def update_posts(self):
+        if self.stacked_posts != None:
+            posts_widget = self.create_posts_widget()
+            posts_widget.layout().setAlignment(Qt.AlignTop)
+            self.stacked_posts.removeWidget(self.stacked_posts.currentWidget())
+            self.stacked_posts.addWidget(posts_widget)
+            self.stacked_posts.setCurrentWidget(posts_widget)
+    
     def create_post(self):
         print('Create post:', self.post_text)
         self.parent.controller.post(self.post_text)
-        self.parent.reload()
+        self.update_posts()
         
     def logout(self):
         self.parent.setup()
