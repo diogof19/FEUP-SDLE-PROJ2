@@ -1,18 +1,11 @@
-import threading
-
 from .node import Node
 from .user_info import UserInfo
-from .event_thread import EventThread
 from .message import Message
 from database.database import PostsDatabase
 from comms.listener import Listener
-from comms.sender import Sender
 
 from os.path import exists, join
 from os import getcwd
-
-from utils.node_utils import run_in_loop
-
 
 class User(Node):
     def __init__(self, ip  : str, port : int, username : str, bootstrap_file : str) -> None:
@@ -27,10 +20,6 @@ class User(Node):
         self.listener.daemon = True
         self.start_listening()
 
-        self.stop_ntp = threading.Event()
-        self.ntp_thread = EventThread(self.stop_ntp)
-        self.ntp_thread.start()
-
     def init_database(self):
         """
         Initialize the database for the user
@@ -42,13 +31,6 @@ class User(Node):
         Start listening for incoming messages
         """
         self.listener.start()
-
-    def stop(self) -> None:
-        """
-        Stop the node
-        """
-        self.stop_ntp.set()
-        super().stop()
 
     async def follow(self, username : str) -> None:
         """
@@ -170,7 +152,12 @@ class User(Node):
         Reset the user's own info
         """
         print("Setting own info")
-        while not self.logged_in and not await self.set_kademlia_info(self.username, self.info):
+        has_set_info = False
+        while True:
+            if has_set_info:
+                break
+            elif self.logged_in:
+                has_set_info = await self.set_kademlia_info(self.username, self.info)
             continue
         print("Set own info")
 
