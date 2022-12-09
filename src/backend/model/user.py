@@ -19,11 +19,13 @@ class User(Node):
         super().__init__(ip, port, bootstrap_file)
 
         self.username = username
+        self.logged_in = False
         self.database = None
 
         self.info = UserInfo(ip, port, [], [])
         self.listener = Listener(self.info.ip, self.info.port, self)
         self.listener.daemon = True
+        self.start_listening()
 
         self.stop_ntp = threading.Event()
         self.ntp_thread = EventThread(self.stop_ntp)
@@ -100,7 +102,7 @@ class User(Node):
 
         print('followers:', self.info.followers)
         all_posts_sent = True
-        
+
         for follower in self.info.followers:
             follower_info = await self.get_kademlia_info(follower)
             all_posts_sent = all_posts_sent and await self.send_message(follower_info.ip, follower_info.port, Message.post_message(self.username, self.info.last_post_id, body, self.database.get_date(self.info.last_post_id)))
@@ -121,7 +123,7 @@ class User(Node):
         await self.set_kademlia_info(self.username, self.info)
         print(f'User {self.username} registered')
         self.init_database()
-
+        self.logged_in = True
         return True
 
     async def login(self) -> None:
@@ -137,12 +139,14 @@ class User(Node):
             self.info = UserInfo(self.ip, self.port, info.followers, info.following, info.last_post_id)
             await self.set_kademlia_info(self.username, self.info)
             self.init_database()
+            self.logged_in = True
             return True
         elif exists(join(getcwd(), 'database', 'db', f'{self.username}.db')):
             self.init_database()
             info = self.database.get_info()
             self.info = UserInfo(self.ip, self.port, info['followers'], info['following'], info['last_post_id'])
             await self.set_kademlia_info(self.username, self.info)
+            self.logged_in = True
             return True
 
         print(f'User {self.username} not found')
@@ -166,9 +170,8 @@ class User(Node):
         Reset the user's own info
         """
         print("Setting own info")
-        while not await self.set_kademlia_info(self.username, self.info):
-            pass
-        self.has_set_own_info = True
+        while not self.logged_in and not await self.set_kademlia_info(self.username, self.info):
+            continue
         print("Set own info")
 
     async def ping(self, username : str) -> bool:

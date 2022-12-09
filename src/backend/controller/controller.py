@@ -50,11 +50,9 @@ class Controller:
     
     def register(self):
         print(run_in_loop(self.user.register(), self.user.loop).result())
-        self.user.start_listening()
         
     def login(self):
         print(run_in_loop(self.user.login(), self.user.loop).result())
-        self.user.start_listening()
     
     def timeline(self):
         #TODO: Implement timeline
