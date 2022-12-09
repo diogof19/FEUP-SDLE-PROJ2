@@ -34,15 +34,19 @@ class Controller:
                     print(run_in_loop(self.user.get_kademlia_info(username), self.user.loop).result())
                 elif cmd == 'set_own_info':
                     run_in_loop(self.user.set_own_info(), self.user.loop)
+                elif cmd == 'ping':
+                    username = input('Enter username: ')
+                    print(run_in_loop(self.user.ping(username), self.user.loop).result())
                 else:
                     print('Invalid command')
         except KeyboardInterrupt:
             print('Exiting...')
             self.user.stop()
-        
-    
+
     def post(self, body):
-        print(run_in_loop(self.user.post(body), self.user.loop).result())
+        result = run_in_loop(self.user.post(body), self.user.loop).result()
+        print(result)
+        return result
     
     def register(self):
         print(run_in_loop(self.user.register(), self.user.loop).result())
@@ -61,20 +65,14 @@ class Controller:
         return posts
     
     def unfollow(self, username):
-        try:
-            run_in_loop(self.user.unfollow(username), self.user.loop).result()
-            return True
-        except Exception as e:
-            return False
+        result = run_in_loop(self.user.unfollow(username), self.user.loop).result()
+        print(result)
+        return result
     
     def follow(self, username):
-        try:
-            return run_in_loop(self.user.follow(username), self.user.loop).result()
-        except Exception as e:
-            if(str(e) == 'This event loop is already running'):
-                return True
-            else:
-                return False
+        result = run_in_loop(self.user.follow(username), self.user.loop).result()
+        print(result)
+        return result
         
     def get_followers(self):
         return self.user.get_followers()
