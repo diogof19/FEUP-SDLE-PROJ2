@@ -41,16 +41,18 @@ class TimelineLayout(QGridLayout):
         info_layout.setAlignment(Qt.AlignTop)
         info_layout.setContentsMargins(10, 10, 10, 10)
         
-        self.followers_widget = self.create_followers_widget()
+        followers_widget = self.create_followers_widget()
+        #info_layout.setSpacing(0)
+        #info_layout.addWidget(followers_widget)
+        
+        self.stacked_followers = QStackedWidget()
+        self.stacked_followers.addWidget(followers_widget)
         info_layout.setSpacing(0)
-        info_layout.addWidget(self.followers_widget)
+        info_layout.addWidget(self.stacked_followers)
         
         following_widget = self.create_following_widget()
         info_layout.setSpacing(15)
-        
-        self.stacked_following = QStackedWidget()
-        self.stacked_following.addWidget(following_widget)
-        info_layout.addWidget(self.stacked_following)
+        info_layout.addWidget(following_widget)
         
         info_widget = QGroupBox()
         info_widget.setObjectName('info_widget')
@@ -205,13 +207,6 @@ class TimelineLayout(QGridLayout):
         print('unfollow:', username)
         self.parent.controller.unfollow(username)
         self.parent.reload()
-    
-    def update_following(self):
-        if self.stacked_following != None:
-            following = self.create_following_widget()
-            self.stacked_following.removeWidget(self.stacked_following.currentWidget())
-            self.stacked_following.addWidget(following)
-        self.stacked_following.setCurrentWidget(following)
         
     def update_followers(self):
         if self.stacked_followers != None:
@@ -244,6 +239,7 @@ class TimelineLayout(QGridLayout):
         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         
         layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignTop)
         
         followers_title = QLabel('Followers:')
         followers_title.setObjectName('followers_title')
@@ -255,6 +251,7 @@ class TimelineLayout(QGridLayout):
         layout.addWidget(followers_title)
         
         followers_layout = QVBoxLayout()
+        followers_layout.setAlignment(Qt.AlignTop)
         followers = self.get_all_followers()
         for follower in followers:
             follower_widget = self.create_follow_widget(follower)
@@ -279,24 +276,17 @@ class TimelineLayout(QGridLayout):
         
         return widget
     
-    def create_following_widget(self):
-        widget = QGroupBox()
-        widget.setObjectName('following_widget')
-        widget.setMaximumHeight(400)
-        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
-        
-        layout = QVBoxLayout()
-                
-        followers_title = QLabel('Following:')
-        followers_title.setObjectName('following_title')
-        followers_title.setAlignment(Qt.AlignLeft)
-        followers_title.setMargin(0)
-        followers_title.setFixedHeight(30)
-
-        layout.setSpacing(0)
-        layout.addWidget(followers_title)
-        
+    def update_following(self):
+        if self.stacked_following != None:
+            following = self.create_following_list_widget()
+            self.stacked_following.removeWidget(self.stacked_following.currentWidget())
+            self.stacked_following.addWidget(following)
+            self.stacked_following.setCurrentWidget(following)
+    
+    def create_following_list_widget(self):
         followers_layout = QVBoxLayout()
+        followers_layout.setAlignment(Qt.AlignTop)
+        
         followers = self.get_all_following()
         for follower in followers:
             follower_layout = QHBoxLayout()
@@ -313,10 +303,38 @@ class TimelineLayout(QGridLayout):
             follower_layout.setSpacing(0)
             follower_layout.addWidget(unfollow_button)
             
+            followers_layout.setSpacing(0)
+            followers_layout.addLayout(follower_layout)
+            
             
         followers_widget = QGroupBox()
         followers_widget.setObjectName('followers_list')
         followers_widget.setLayout(followers_layout)
+        followers_widget.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
+        
+        return followers_widget
+    
+    def create_following_widget(self):
+        widget = QGroupBox()
+        widget.setObjectName('following_widget')
+        widget.setMaximumHeight(600)
+        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
+        
+        layout = QVBoxLayout()
+                
+        followers_title = QLabel('Following:')
+        followers_title.setObjectName('following_title')
+        followers_title.setAlignment(Qt.AlignLeft)
+        followers_title.setMargin(0)
+        followers_title.setFixedHeight(30)
+
+        layout.setSpacing(0)
+        layout.addWidget(followers_title)
+        
+        followers_widget = self.create_following_list_widget()
+        
+        self.stacked_following = QStackedWidget()
+        self.stacked_following.addWidget(followers_widget)
         
         followers_scroll = QScrollArea()
         followers_scroll.setWidgetResizable(True)
@@ -324,7 +342,7 @@ class TimelineLayout(QGridLayout):
         followers_scroll.setViewportMargins(0, 0, 0, 0)
         followers_scroll.setObjectName('followers_scroll')
         followers_scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
-        followers_scroll.setWidget(followers_widget)
+        followers_scroll.setWidget(self.stacked_following)
         
         layout.addWidget(followers_scroll)
         
