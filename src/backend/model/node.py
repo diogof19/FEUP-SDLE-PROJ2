@@ -25,6 +25,7 @@ class Node:
         
         self.loop.run_until_complete(self.server.listen(self.port))
         self.loop.run_until_complete(self.server.bootstrap(self.connected_nodes))
+        self.loop.run_until_complete(self.server._refresh_table())
 
         for node in self.connected_nodes:
             run_in_loop(self.send_message(node[0], node[1], Message.set_own_kademlia_info_message()), self.loop)

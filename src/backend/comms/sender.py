@@ -5,7 +5,9 @@ class Sender:
     @staticmethod
     async def send_message(ip : str, port : int, message : str) -> None:
         try:
+            print(f'Sending message to {ip}:{port} ({message})')
             _, writer = await open_connection(ip, port)
+            print('Opened connection')
             writer.write(message.encode())
             await writer.drain()
             writer.close()

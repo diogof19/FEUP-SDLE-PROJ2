@@ -8,6 +8,8 @@ from model.user import User
 from threading import Thread
 from controller.controller import Controller
 
+from utils.node_utils import run_in_loop
+
 '''
 python main.py -register 'name' 'port'
 python main.py -timeline 'name'
@@ -40,6 +42,11 @@ def main():
         timeline_window.setStyleSheet(_style)
 
     app.exec()
+
+    peer.server.stop()
+    print("Stopping server")
+    peer.listener.server.close()
+    peer.loop.stop()
     
     os._exit(0)
 
