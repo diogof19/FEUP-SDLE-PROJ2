@@ -39,6 +39,9 @@ class User(Node):
         Follow a user
         TODO: What happens when user is offline?
         """
+        if(username == self.username):
+            return False
+
         new_follow_info = await self.get_kademlia_info(username)
         
         if new_follow_info is None:
@@ -182,6 +185,7 @@ class User(Node):
 
             try:
                 user_info = await self.get_kademlia_info(following)
+                print(user_info)
                 reader, writer = await asyncio.open_connection(user_info.ip, user_info.port)
 
                 writer.write(message.encode())
