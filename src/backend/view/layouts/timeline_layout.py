@@ -42,9 +42,6 @@ class TimelineLayout(QGridLayout):
         info_layout.setContentsMargins(10, 10, 10, 10)
         
         followers_widget = self.create_followers_widget()
-        #info_layout.setSpacing(0)
-        #info_layout.addWidget(followers_widget)
-        
         self.stacked_followers = QStackedWidget()
         self.stacked_followers.addWidget(followers_widget)
         info_layout.setSpacing(0)
@@ -236,7 +233,7 @@ class TimelineLayout(QGridLayout):
         widget = QGroupBox()
         widget.setObjectName('followers_widget')
         widget.setMaximumHeight(400)
-        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
+        widget.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
         
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignTop)
@@ -260,6 +257,8 @@ class TimelineLayout(QGridLayout):
             
         followers_widget = QGroupBox()
         followers_widget.setObjectName('followers_list')
+        followers_widget.setMaximumHeight(400)
+        followers_widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
         followers_widget.setLayout(followers_layout)
         
         followers_scroll = QScrollArea()
@@ -270,6 +269,7 @@ class TimelineLayout(QGridLayout):
         followers_scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
         followers_scroll.setWidget(followers_widget)
         
+        layout.setSpacing(0)
         layout.addWidget(followers_scroll)
         
         widget.setLayout(layout)
@@ -309,6 +309,7 @@ class TimelineLayout(QGridLayout):
             
         followers_widget = QGroupBox()
         followers_widget.setObjectName('followers_list')
+        followers_widget.setMaximumHeight(400)
         followers_widget.setLayout(followers_layout)
         followers_widget.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
         
@@ -357,10 +358,11 @@ class TimelineLayout(QGridLayout):
         follow_button = QPushButton('Follow')
         follow_button.setObjectName('create_post_button')
         follow_button.clicked.connect(self.follow)
+        follow_button.clicked.connect(follow_input.clear)
         follow_button.setMaximumWidth(100)
         follow_button.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
         
-        self.follow_error_widget = QLabel('User not found')
+        self.follow_error_widget = QLabel('Unable to follow user.')
         self.follow_error_widget.setObjectName('follow_error')
         self.follow_error_widget.setAlignment(Qt.AlignLeft)
         self.follow_error_widget.hide()
@@ -397,4 +399,4 @@ class TimelineLayout(QGridLayout):
         self.update_posts()
         
     def logout(self):
-        self.parent.setup()
+        self.parent.logout()

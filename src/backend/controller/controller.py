@@ -22,8 +22,6 @@ class Controller:
                     print(self.follow(input("Enter username: ")))
                 elif cmd == 'unfollow':
                     self.unfollow(input("Enter username: "))
-                elif cmd == 'timeline':
-                    self.timeline()
                 elif cmd == 'exit':
                     self.user.stop_ntp.set()
                     break
@@ -53,10 +51,6 @@ class Controller:
         
     def login(self):
         print(run_in_loop(self.user.login(), self.user.loop).result())
-    
-    def timeline(self):
-        #TODO: Implement timeline
-        pass
     
     def get_posts(self, user):
         posts = self.user.database.get_posts()

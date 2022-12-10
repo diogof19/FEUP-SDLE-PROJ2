@@ -83,13 +83,11 @@ class User(Node):
         await self.set_kademlia_info(self.username, self.info)
 
         print('followers:', self.info.followers)
-        all_posts_sent = True
 
         for follower in self.info.followers:
             follower_info = await self.get_kademlia_info(follower)
-            all_posts_sent = all_posts_sent and await self.send_message(follower_info.ip, follower_info.port, Message.post_message(self.username, self.info.last_post_id, body, self.database.get_date(self.info.last_post_id)))
-
-        print('all posts sent:', all_posts_sent)
+            if follower_info != None:
+                await self.send_message(follower_info.ip, follower_info.port, Message.post_message(self.username, self.info.last_post_id, body, self.database.get_date(self.info.last_post_id)))
 
         return True
 

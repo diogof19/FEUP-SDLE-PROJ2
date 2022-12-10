@@ -110,17 +110,16 @@ class MainWindow(QMainWindow):
         
     def logout(self):
         print("Logout")
-        self.logged_in = False
-        layout = StartLayout(self)
-        layout.setAlignment(Qt.AlignTop)
         
+        self.logged_in = False
+        self.timeline_layout = None
+        layout = StartLayout(self)
+
         widget = QWidget()
         widget.width = 400
         widget.setLayout(layout)
 
         self.setCentralWidget(widget)
-
-        self.show()
         
     def update(self):
         if self.timeline_layout != None:
