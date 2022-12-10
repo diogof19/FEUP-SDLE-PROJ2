@@ -130,6 +130,7 @@ class User(Node):
             await self.set_kademlia_info(self.username, self.info)
             self.init_database()
             self.logged_in = True
+            await self.get_missing_posts()
             return True
         elif exists(join(getcwd(), 'database', 'db', f'{self.username}.db')):
             self.init_database()
@@ -137,6 +138,7 @@ class User(Node):
             self.info = UserInfo(self.ip, self.port, info['followers'], info['following'], info['last_post_id'])
             await self.set_kademlia_info(self.username, self.info)
             self.logged_in = True
+            await self.get_missing_posts()
             return True
 
         print(f'User {self.username} not found')
@@ -180,7 +182,6 @@ class User(Node):
         Get the missing posts from the database when you are offline
         Since the previous last_post_id to the current last_post_id
         """
-        print('following:', self.info.following)
         for following in self.info.following:
             last_post_id = self.database.get_max_post_id_for_username(following)
             message = Message.sync_missing(
@@ -190,12 +191,19 @@ class User(Node):
                 )
 
             try:
-                user_info = await self.get_kademlia_info(following)
-                print("User_info:", user_info)
-                await self.send_message(user_info.ip, user_info.port, message)
+                following_info = await self.get_kademlia_info(following)
+                if following_info is not None:
+                    await self.send_message(following_info.ip, following_info.port, message)
 
             except ConnectionRefusedError:
-                print(f'User {following} is offline')
+                for int_following in self.info.following:
+                    following_info = await self.get_kademlia_info(int_following)
+
+                    if following_info.following in following:
+                        try:
+                            await self.send_message(following_info.ip, following_info.port, message)
+                        except ConnectionRefusedError:
+                            pass
 
 
 

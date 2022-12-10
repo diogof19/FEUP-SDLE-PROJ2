@@ -34,7 +34,7 @@ class Listener(Thread):
         elif (message['message_type'] == 'set_own_kademlia_info'):
             set_own_kademlia_info_handler(self.user)
         elif (message['message_type'] == 'sync_posts'):
-            await sync_handler(self.user.database, message['username'], message['last_post_id'], self.user)
+            await sync_handler(self.user.database, message['username'], message['follow'], message['last_post_id'], self.user)
         elif (message['message_type'] == 'send_posts'):
             await send_posts_handler(self.user.database, message['posts'], self.user)
         else:

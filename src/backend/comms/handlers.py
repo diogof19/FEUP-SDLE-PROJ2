@@ -14,8 +14,8 @@ async def unfollow_handler(db: PostsDatabase, username: str, user):
     user.info.followers.remove(username)
     await user.set_kademlia_info(user.username, user.info)
 
-async def sync_handler(db: PostsDatabase, username: str, last_post_id: int, user):
-    posts = db.get_posts_since_post_id(user.username, last_post_id)
+async def sync_handler(db: PostsDatabase, username: str, follow: str, last_post_id: int, user):
+    posts = db.get_posts_since_post_id(follow, last_post_id)
     user_info = await user.get_kademlia_info(username)
     await user.send_message(user_info.ip, user_info.port, Message.send_posts(user.username, posts))
 
