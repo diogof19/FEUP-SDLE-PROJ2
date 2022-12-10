@@ -152,12 +152,7 @@ class User(Node):
         Reset the user's own info
         """
         print("Setting own info")
-        has_set_info = False
-        while True:
-            if has_set_info:
-                break
-            elif self.logged_in:
-                has_set_info = await self.set_kademlia_info(self.username, self.info)
+        while not self.logged_in and not await self.set_kademlia_info(self.username, self.info):
             continue
         print("Set own info")
 
