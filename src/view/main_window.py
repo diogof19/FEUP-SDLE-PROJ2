@@ -151,4 +151,3 @@ class MainWindow(QMainWindow):
         if self.timeline_layout != None:
             self.timeline_layout.update_posts()
             self.timeline_layout.update_followers()
-            self.timeline_layout.update_following()

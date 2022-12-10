@@ -227,7 +227,7 @@ class TimelineLayout(QGridLayout):
         """
         print('unfollow:', username)
         self.parent.controller.unfollow(username)
-        self.parent.reload()
+        self.update_following()
         
     def update_followers(self):
         """
