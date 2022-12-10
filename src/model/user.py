@@ -133,6 +133,8 @@ class User(Node):
             await self.set_kademlia_info(self.username, self.info)
             self.init_database()
             self.logged_in = True
+            for node in self.connected_nodes:
+                await self.send_message(node[0], node[1], Message.set_own_kademlia_info_message())
             await self.get_missing_posts()
             return True
         elif exists(join(getcwd(), 'database', 'db', f'{self.username}.db')):
@@ -141,6 +143,8 @@ class User(Node):
             self.info = UserInfo(self.ip, self.port, info['followers'], info['following'], info['last_post_id'])
             await self.set_kademlia_info(self.username, self.info)
             self.logged_in = True
+            for node in self.connected_nodes:
+                await self.send_message(node[0], node[1], Message.set_own_kademlia_info_message())
             await self.get_missing_posts()
             return True
 
@@ -165,8 +169,7 @@ class User(Node):
         Reset the user's own info
         """
         print("Setting own info")
-        while not self.logged_in and not await self.set_kademlia_info(self.username, self.info):
-            continue
+        await self.set_kademlia_info(self.username, self.info)
         print("Set own info")
 
     async def ping(self, username : str) -> bool:
