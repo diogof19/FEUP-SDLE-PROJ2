@@ -166,3 +166,15 @@ class User(Node):
             pass
         self.has_set_own_info = True
         print("Set own info")
+
+    async def get_missing_posts(self) -> None:
+        """
+        Get the missing posts from the database when you are offline
+        Since the previous last_post_id to the current last_post_id
+        """
+        missing_posts = []
+        print("Following:", self.info.following)
+        for following in self.info.following:
+            following_info = await self.get_kademlia_info(following)
+            print("Database max_post_id:", self.database.get_max_post_id_for_username(following))
+            

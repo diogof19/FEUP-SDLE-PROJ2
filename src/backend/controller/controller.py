@@ -32,6 +32,8 @@ class Controller:
                 elif cmd == 'get_info':
                     username = input('Enter username: ')
                     print(run_in_loop(self.user.get_kademlia_info(username), self.user.loop).result())
+                elif cmd == 'missing':
+                    self.get_missing()
                 elif cmd == 'set_own_info':
                     run_in_loop(self.user.set_own_info(), self.user.loop)
                 else:
@@ -84,3 +86,6 @@ class Controller:
     
     def get_username(self):
         return self.user.username
+        
+    def get_missing(self):
+        print(run_in_loop(self.user.get_missing_posts(), self.user.loop).result())
