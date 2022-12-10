@@ -22,8 +22,6 @@ class Controller:
                     print(self.follow(input("Enter username: ")))
                 elif cmd == 'unfollow':
                     self.unfollow(input("Enter username: "))
-                elif cmd == 'timeline':
-                    self.timeline()
                 elif cmd == 'exit':
                     self.user.stop_ntp.set()
                     break
@@ -36,47 +34,39 @@ class Controller:
                     self.get_missing()
                 elif cmd == 'set_own_info':
                     run_in_loop(self.user.set_own_info(), self.user.loop)
+                elif cmd == 'ping':
+                    username = input('Enter username: ')
+                    print(run_in_loop(self.user.ping(username), self.user.loop).result())
                 else:
                     print('Invalid command')
         except KeyboardInterrupt:
             print('Exiting...')
             self.user.stop()
-        
-    
+
     def post(self, body):
-        print(run_in_loop(self.user.post(body), self.user.loop).result())
+        result = run_in_loop(self.user.post(body), self.user.loop).result()
+        print(result)
+        return result
     
     def register(self):
         print(run_in_loop(self.user.register(), self.user.loop).result())
-        self.user.start_listening()
         
     def login(self):
         print(run_in_loop(self.user.login(), self.user.loop).result())
-        self.user.start_listening()
-    
-    def timeline(self):
-        #TODO: Implement timeline
-        pass
     
     def get_posts(self, user):
         posts = self.user.database.get_posts()
         return posts
     
     def unfollow(self, username):
-        try:
-            run_in_loop(self.user.unfollow(username), self.user.loop).result()
-            return True
-        except Exception as e:
-            return False
+        result = run_in_loop(self.user.unfollow(username), self.user.loop).result()
+        print(result)
+        return result
     
     def follow(self, username):
-        try:
-            return run_in_loop(self.user.follow(username), self.user.loop).result()
-        except Exception as e:
-            if(str(e) == 'This event loop is already running'):
-                return True
-            else:
-                return False
+        result = run_in_loop(self.user.follow(username), self.user.loop).result()
+        print(result)
+        return result
         
     def get_followers(self):
         return self.user.get_followers()

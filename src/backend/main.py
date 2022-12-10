@@ -1,20 +1,12 @@
 import sys
 import os
-import atexit
-import signal
-import multiprocessing
 
 from PySide6.QtWidgets import QApplication
 from view.main_window import MainWindow
 
-from kademlia.network import Server
 from model.user import User
 from threading import Thread
-from comms import sender
-from comms import listener
 from controller.controller import Controller
-
-import threading
 
 '''
 python main.py -register 'name' 'port'

@@ -43,3 +43,10 @@ class Message:
         Create a set own kademlia info message
         """
         return Message.create_message('', 'set_own_kademlia_info', {})
+
+    @staticmethod
+    def ping_message() -> str:
+        """
+        Create a ping message
+        """
+        return Message.create_message('', 'ping', {})

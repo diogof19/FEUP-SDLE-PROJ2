@@ -1,33 +1,24 @@
-import threading
-
 from .node import Node
 from .user_info import UserInfo
-from .event_thread import EventThread
 from .message import Message
 from database.database import PostsDatabase
 from comms.listener import Listener
-from comms.sender import Sender
 
 from os.path import exists, join
 from os import getcwd
-
-from utils.node_utils import run_in_loop
-
 
 class User(Node):
     def __init__(self, ip  : str, port : int, username : str, bootstrap_file : str) -> None:
         super().__init__(ip, port, bootstrap_file)
 
         self.username = username
+        self.logged_in = False
         self.database = None
 
         self.info = UserInfo(ip, port, [], [])
         self.listener = Listener(self.info.ip, self.info.port, self)
         self.listener.daemon = True
-
-        self.stop_ntp = threading.Event()
-        self.ntp_thread = EventThread(self.stop_ntp)
-        self.ntp_thread.start()
+        self.start_listening()
 
     def init_database(self):
         """
@@ -40,13 +31,6 @@ class User(Node):
         Start listening for incoming messages
         """
         self.listener.start()
-
-    def stop(self) -> None:
-        """
-        Stop the node
-        """
-        self.stop_ntp.set()
-        super().stop()
 
     async def follow(self, username : str) -> None:
         """
@@ -99,9 +83,11 @@ class User(Node):
         await self.set_kademlia_info(self.username, self.info)
 
         print('followers:', self.info.followers)
+
         for follower in self.info.followers:
             follower_info = await self.get_kademlia_info(follower)
-            run_in_loop(self.send_message(follower_info.ip, follower_info.port, Message.post_message(self.username, self.info.last_post_id, body, self.database.get_date(self.info.last_post_id))), self.loop)
+            if follower_info != None:
+                await self.send_message(follower_info.ip, follower_info.port, Message.post_message(self.username, self.info.last_post_id, body, self.database.get_date(self.info.last_post_id)))
 
         return True
 
@@ -117,7 +103,7 @@ class User(Node):
         await self.set_kademlia_info(self.username, self.info)
         print(f'User {self.username} registered')
         self.init_database()
-
+        self.logged_in = True
         return True
 
     async def login(self) -> None:
@@ -133,12 +119,14 @@ class User(Node):
             self.info = UserInfo(self.ip, self.port, info.followers, info.following, info.last_post_id)
             await self.set_kademlia_info(self.username, self.info)
             self.init_database()
+            self.logged_in = True
             return True
         elif exists(join(getcwd(), 'database', 'db', f'{self.username}.db')):
             self.init_database()
             info = self.database.get_info()
             self.info = UserInfo(self.ip, self.port, info['followers'], info['following'], info['last_post_id'])
             await self.set_kademlia_info(self.username, self.info)
+            self.logged_in = True
             return True
 
         print(f'User {self.username} not found')
@@ -162,10 +150,25 @@ class User(Node):
         Reset the user's own info
         """
         print("Setting own info")
-        while not await self.set_kademlia_info(self.username, self.info):
-            pass
-        self.has_set_own_info = True
+        has_set_info = False
+        while True:
+            if has_set_info:
+                break
+            elif self.logged_in:
+                has_set_info = await self.set_kademlia_info(self.username, self.info)
+            continue
         print("Set own info")
+
+    async def ping(self, username : str) -> bool:
+        """
+        Ping a user
+        """
+        print(f'Pinging user {username}')
+        info = await self.get_kademlia_info(username)
+        if info is None:
+            return False
+        print('info:', info)
+        return await self.send_message(info.ip, info.port, Message.ping_message())
 
     async def get_missing_posts(self) -> None:
         """
