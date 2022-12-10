@@ -33,8 +33,6 @@ def main():
 
     timeline_window = MainWindow(controller)
 
-    peer.listener.set_view(timeline_window)
-
     with open("view/layouts/style.qss", "r") as f:
         _style = f.read()
         timeline_window.setStyleSheet(_style)
