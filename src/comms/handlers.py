@@ -53,7 +53,7 @@ async def post_handler(db: PostsDatabase, post_id: int, username: str, body: str
     # If the user is not following the user who posted send an unfollow request to remove the user from the followers list
     else:
         messager_info = await user.get_kademlia_info(username)
-        run_in_loop(user.send_message(messager_info.ip, messager_info.port, Message.unfollow_message(username)), user.loop)
+        run_in_loop(user.send_message(messager_info.ip, messager_info.port, Message.unfollow_message(user.username)), user.loop)
 
 async def send_posts_handler(db: PostsDatabase, posts: list, user):
     """
