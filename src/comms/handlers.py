@@ -13,7 +13,8 @@ async def follow_handler(db: PostsDatabase, username: str, user):
     :param user: The user who received the follow request
     """
     db.add_follower(username)
-    user.info.followers.append(username)
+    if username not in user.info.followers:
+        user.info.followers.append(username)
     await user.set_kademlia_info(user.username, user.info)
 
 async def unfollow_handler(db: PostsDatabase, username: str, user):

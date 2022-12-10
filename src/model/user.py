@@ -36,7 +36,7 @@ class User(Node):
     async def follow(self, username : str) -> None:
         """
         Follow a user
-        Only works if the user is online
+        Works even if the user is offline
         """
         if(username == self.username):
             return False
@@ -50,6 +50,8 @@ class User(Node):
         await self.set_kademlia_info(self.username, self.info)
         
         self.database.add_following(username)
+        new_follow_info.followers.append(self.username)
+        await self.set_kademlia_info(username, new_follow_info)
 
         await self.send_message(new_follow_info.ip, new_follow_info.port, Message.follow_message(self.username))
         
@@ -151,6 +153,18 @@ class User(Node):
         print(f'User {self.username} not found')
 
         return False
+
+    def sync_db_followers(self):
+        """
+        Sync the followers in the database
+
+        Only new followers are added as if there are any extra followers in the database they will be removed if a post is sent to them
+        """
+        db_followers = self.database.get_followers()
+
+        for follower in self.info.followers:
+            if follower not in db_followers:
+                self.database.add_follower(follower)
     
     def get_followers(self):
         """
@@ -203,7 +217,7 @@ class User(Node):
                 if following_info is not None and following_info.online == True:
                     await self.send_message(following_info.ip, following_info.port, message)
                 # If user is offline get the missing posts from their followers
-                elif following_info.online == False:
+                elif following_info is not None and following_info.online == False:
                     print(f'User {following} is offline')
                     for int_following in following_info.followers:
                         following_info = await self.get_kademlia_info(int_following)
