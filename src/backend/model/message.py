@@ -53,13 +53,20 @@ class Message:
 
 
     @staticmethod
-    def sync_missing(self_user, last_post_id, username) -> str:
+    def sync_missing(username, last_post_id, user) -> str:
         """
         Create a sync missing message
         """
-        return Message.create_message(self_user, "sync_posts", {
+        return Message.create_message(username, "sync_posts", {
             "last_post_id": last_post_id,
-            "username": username,
+            "follow": user,
         })
+
+    @staticmethod
+    def send_posts(username, posts) -> str:
+        """
+        Create a send posts message
+        """
+        return Message.create_message(username, "send_posts", {"posts": posts})
 
 

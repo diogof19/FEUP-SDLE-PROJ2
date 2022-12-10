@@ -36,7 +36,7 @@ class Controller:
                     run_in_loop(self.user.set_own_info(), self.user.loop)
                 elif cmd == 'ping':
                     username = input('Enter username: ')
-                    print(run_in_loop(self.user.ping(username), self.user.loop).result())
+                    print(run_in_loop(self.user.ping(username), self.user.loop).result())  
                 else:
                     print('Invalid command')
         except KeyboardInterrupt:
@@ -53,6 +53,9 @@ class Controller:
         
     def login(self):
         print(run_in_loop(self.user.login(), self.user.loop).result())
+
+    def logout(self):
+        print(run_in_loop(self.user.logout(), self.user.loop).result())
     
     def get_posts(self, user):
         posts = self.user.database.get_posts()

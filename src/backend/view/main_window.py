@@ -113,6 +113,7 @@ class MainWindow(QMainWindow):
         
         self.logged_in = False
         self.timeline_layout = None
+        self.controller.logout()
         layout = StartLayout(self)
 
         widget = QWidget()

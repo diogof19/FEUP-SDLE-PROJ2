@@ -111,6 +111,11 @@ class User(Node):
         self.logged_in = True
         return True
 
+    async def logout(self) -> None:
+        self.logged_in = False
+        self.database = None
+        return True
+
     async def login(self) -> None:
         """
         Login the user
@@ -186,14 +191,9 @@ class User(Node):
 
             try:
                 user_info = await self.get_kademlia_info(following)
-
+                print("User_info:", user_info)
                 await self.send_message(user_info.ip, user_info.port, message)
-                following_missing = self.database.get_posts_since_post_id(last_post_id, following)
-                print(last_post_id)
-                print(self.database.get_max_post_id_for_username(following))
-                print(following_missing)
-                for post in following_missing:
-                    print(post)
+
             except ConnectionRefusedError:
                 print(f'User {following} is offline')
 
