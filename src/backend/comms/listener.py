@@ -1,23 +1,33 @@
 import asyncio
-from threading import Thread, Event
+from threading import Thread
 from model.message import Message
 from comms.handlers import post_handler,follow_handler, set_own_kademlia_info_handler, unfollow_handler, sync_handler, send_posts_handler
 
 class Listener(Thread):
+    """
+    Class responsible for listening for incoming messages
+    """
     def __init__(self, ip : str, port : int, user) -> None:
         super().__init__()
         self.ip = ip
         self.port = port
         self.user = user
-        self.view = None
 
     async def request_handler(self, reader, _) -> None:
         """
         Handles incoming requests.
+
+        :param reader: The reader to read the request from
         """
 
+        # If the user is not logged in, ignore the request
+        # We wanted to take the node down however we encountered a bug in kadmelia
+        # where depending on the position of the node in the hash table the other 
+        # nodes in the network would lose their neighbours gradually and the network
+        # would eventually collapse.
+        # This issue was also encountered in other groups
         if(not self.user.logged_in):
-            return None
+            return
 
         message = await reader.read(-1)
 
@@ -54,6 +64,3 @@ class Listener(Thread):
         """
         new_event_loop = asyncio.new_event_loop()
         new_event_loop.run_until_complete(self.serve())
-
-    def set_view(self, view):
-        self.view = view

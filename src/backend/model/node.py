@@ -31,14 +31,23 @@ class Node:
             run_in_loop(self.send_message(node[0], node[1], Message.set_own_kademlia_info_message()), self.loop)
 
     def setup_logger(self) -> None:
+        """
+        Setup the logger for kadmelia
+        """
         if os.getenv('DEBUG'):
             logging.basicConfig(level=logging.DEBUG)
         logging.getLogger("kademlia").setLevel(logging.INFO)
 
     async def send_message(self, dest_ip : str, dest_port : int, message : str) -> None:
+        """
+        Send a message to a node
+        """
         return await Sender.send_message(dest_ip, dest_port, message)
 
     async def set_kademlia_info(self, username : str, info : UserInfo) -> None:
+        """
+        Set the kademlia info for a user
+        """
         return await self.server.set(username, info.serialize)
 
     async def get_kademlia_info(self, username : str) -> UserInfo:
@@ -51,5 +60,8 @@ class Node:
         return UserInfo.deserialize(user_info)
 
     def stop(self) -> None:
+        """
+        Stop the node
+        """
         self.server.stop()
         asyncio.get_event_loop().stop()

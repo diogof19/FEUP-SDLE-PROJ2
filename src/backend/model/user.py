@@ -92,7 +92,7 @@ class User(Node):
         for follower in self.info.followers:
             follower_info = await self.get_kademlia_info(follower)
             if follower_info != None:
-                await self.send_message(follower_info.ip, follower_info.port, Message.post_message(self.username, self.info.last_post_id, body, self.database.get_date(self.info.last_post_id)))
+                await self.send_message(follower_info.ip, follower_info.port, Message.post_message(self.username, self.info.last_post_id, body, self.database.get_date(self.username, self.info.last_post_id)))
 
         return True
 
@@ -112,6 +112,9 @@ class User(Node):
         return True
 
     async def logout(self) -> None:
+        """
+        Logout the user
+        """
         self.logged_in = False
         self.database = None
         return True

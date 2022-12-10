@@ -2,16 +2,23 @@ from asyncio import open_connection
 
 
 class Sender:
+    """
+    Class responsible for sending messages
+    """
     @staticmethod
     async def send_message(ip : str, port : int, message : str) -> None:
+        """
+        Sends a message to a user
+
+        :param ip: The ip of the user
+        :param port: The port of the user
+        :param message: The message to be sent
+        """
         try:
-            print(f'Sending message to {ip}:{port} ({message})')
             _, writer = await open_connection(ip, port)
-            print('Opened connection')
             writer.write(message.encode())
             await writer.drain()
             writer.close()
-            print(f'Sent message to {ip}:{port} ({message})')
             return True
         except Exception as _:
             return False

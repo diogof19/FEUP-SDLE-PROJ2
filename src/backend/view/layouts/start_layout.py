@@ -12,6 +12,9 @@ class StartLayout(QHBoxLayout):
         self.setup()
 
     def setup(self):
+        """
+        Landing page layout
+        """
         # Left side
         left_side = QVBoxLayout()
         left_side.addWidget(QWidget())

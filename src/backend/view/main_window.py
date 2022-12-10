@@ -13,6 +13,9 @@ class ReloadSignal(QObject):
     signal = Signal(int)
 
 class Updater(QRunnable):
+    """
+    Worker thread to update the timeline and followers list periodically
+    """
     signals = ReloadSignal()
 
     def __init__(self):
@@ -24,6 +27,9 @@ class Updater(QRunnable):
             time.sleep(0.1)
 
 class MainWindow(QMainWindow):
+    """
+    GUI main window
+    """
     def __init__(self, controller):
         super().__init__()
         self.title = 'Singer'        
@@ -36,12 +42,16 @@ class MainWindow(QMainWindow):
         self.timeline_layout = None
         self.setup()
 
+        # Start the background thread to update the timeline, followers list, etc.
         self.threadpool = QThreadPool()
         self.updater = Updater()
         self.updater.signals.signal.connect(self.update)
         self.threadpool.start(self.updater)
         
     def setup(self):
+        """
+        Start page layout
+        """
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
         self.setStyleSheet(f'\
@@ -60,6 +70,9 @@ class MainWindow(QMainWindow):
         self.show()
         
     def login(self, username):
+        """
+        Login to the system
+        """
         print("Logging in as", username)
         self.controller.user.username = username
         self.controller.login()
@@ -77,6 +90,9 @@ class MainWindow(QMainWindow):
         self.show()
         
     def register(self, username):
+        """
+        Register to the system
+        """
         print("Registering as", username)
         self.controller.user.username = username
         self.controller.register()
@@ -94,6 +110,9 @@ class MainWindow(QMainWindow):
         self.show()
         
     def reload(self):
+        """
+        Reload the timeline layout
+        """
         if not self.logged_in: 
             return
         
@@ -109,6 +128,9 @@ class MainWindow(QMainWindow):
         self.show()
         
     def logout(self):
+        """
+        Logout from the system
+        """
         print("Logout")
         
         self.logged_in = False
@@ -123,6 +145,9 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
         
     def update(self):
+        """
+        Update the posts, followers and following lists
+        """
         if self.timeline_layout != None:
             self.timeline_layout.update_posts()
             self.timeline_layout.update_followers()

@@ -17,6 +17,9 @@ class TimelineLayout(QGridLayout):
         self.setup()
         
     def setup(self):
+        """
+        Timeline layout
+        """
         header = QGroupBox()
         header.setObjectName('timeline_header')
         
@@ -127,10 +130,16 @@ class TimelineLayout(QGridLayout):
         super().addWidget(info_widget, 1, 2)
         
     def get_all_posts(self):
+        """
+        Get all posts from the database
+        """
         posts = self.parent.controller.get_posts(self.parent.controller.get_username())
         return posts
     
     def create_posts_widget(self):
+        """
+        Create the posts widget
+        """
         posts_layout = QVBoxLayout()
         posts_layout.setAlignment(Qt.AlignTop)
         
@@ -147,6 +156,9 @@ class TimelineLayout(QGridLayout):
         return posts_widget
     
     def create_post_card(self, post):
+        """
+        Creates a post card
+        """
         card = QGroupBox()
         
         #card.setMaximumWidth(1000)
@@ -192,20 +204,35 @@ class TimelineLayout(QGridLayout):
         return card
     
     def get_all_following(self):
+        """
+        Get all following from the database
+        """
         return self.parent.controller.get_following()
     
     def get_all_followers(self):
+        """
+        Get all followers from the database    
+        """
         return self.parent.controller.get_followers()
     
     def on_follow_text_changed(self, text):
+        """
+        When the follow text changes
+        """
         self.follow_text = text
         
     def unfollow(self, username):
+        """
+        Unfollow a user
+        """
         print('unfollow:', username)
         self.parent.controller.unfollow(username)
         self.parent.reload()
         
     def update_followers(self):
+        """
+        Update the followers widget
+        """
         if self.stacked_followers != None:
             followers = self.create_followers_widget()
             self.stacked_followers.removeWidget(self.stacked_followers.currentWidget())
@@ -213,6 +240,9 @@ class TimelineLayout(QGridLayout):
             self.stacked_followers.setCurrentWidget(followers)
         
     def follow(self):
+        """
+        Follow a user
+        """
         if not self.parent.controller.follow(self.follow_text):
             self.follow_error_widget.show()
         else:
@@ -221,6 +251,9 @@ class TimelineLayout(QGridLayout):
         
         
     def create_follow_widget(self, follow):
+        """
+        Create a follow widget
+        """
         username = QLabel(follow)
         username.setObjectName('follow_username')
         username.setAlignment(Qt.AlignTop)
@@ -230,6 +263,9 @@ class TimelineLayout(QGridLayout):
         return username
     
     def create_followers_widget(self):
+        """
+        Create the followers widget
+        """
         widget = QGroupBox()
         widget.setObjectName('followers_widget')
         widget.setMaximumHeight(400)
@@ -277,6 +313,9 @@ class TimelineLayout(QGridLayout):
         return widget
     
     def update_following(self):
+        """
+        Update the following widget
+        """
         if self.stacked_following != None:
             following = self.create_following_list_widget()
             self.stacked_following.removeWidget(self.stacked_following.currentWidget())
@@ -284,6 +323,9 @@ class TimelineLayout(QGridLayout):
             self.stacked_following.setCurrentWidget(following)
     
     def create_following_list_widget(self):
+        """
+        Create the following list widget
+        """
         followers_layout = QVBoxLayout()
         followers_layout.setAlignment(Qt.AlignTop)
         
@@ -316,6 +358,9 @@ class TimelineLayout(QGridLayout):
         return followers_widget
     
     def create_following_widget(self):
+        """
+        Create the following widget
+        """
         widget = QGroupBox()
         widget.setObjectName('following_widget')
         widget.setMaximumHeight(600)
@@ -383,9 +428,15 @@ class TimelineLayout(QGridLayout):
         return widget
     
     def on_post_text_changed(self, text):
+        """
+        Called when the post text changes
+        """
         self.post_text = text
     
     def update_posts(self):
+        """
+        Update the posts widget
+        """
         if self.stacked_posts != None:
             posts_widget = self.create_posts_widget()
             posts_widget.layout().setAlignment(Qt.AlignTop)
@@ -394,9 +445,15 @@ class TimelineLayout(QGridLayout):
             self.stacked_posts.setCurrentWidget(posts_widget)
     
     def create_post(self):
+        """
+        Create a post
+        """
         print('Create post:', self.post_text)
         self.parent.controller.post(self.post_text)
         self.update_posts()
         
     def logout(self):
+        """
+        Logout
+        """
         self.parent.logout()

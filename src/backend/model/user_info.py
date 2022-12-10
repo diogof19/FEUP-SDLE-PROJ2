@@ -13,6 +13,9 @@ class UserInfo:
     last_post_id : int = 0
 
     def increment_post_id(self) -> int:
+        """
+        Increment the last post id
+        """
         self.last_post_id += 1
         return self.last_post_id
 
