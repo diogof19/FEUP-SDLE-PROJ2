@@ -3,6 +3,8 @@ from .user_info import UserInfo
 from .message import Message
 from database.database import PostsDatabase
 from comms.listener import Listener
+import asyncio
+import json
 
 from os.path import exists, join
 from os import getcwd
@@ -37,6 +39,9 @@ class User(Node):
         Follow a user
         TODO: What happens when user is offline?
         """
+        if(username == self.username):
+            return False
+
         new_follow_info = await self.get_kademlia_info(username)
         
         if new_follow_info is None:
@@ -169,9 +174,32 @@ class User(Node):
         Get the missing posts from the database when you are offline
         Since the previous last_post_id to the current last_post_id
         """
-        missing_posts = []
-        print("Following:", self.info.following)
+        print('following:', self.info.following)
         for following in self.info.following:
-            following_info = await self.get_kademlia_info(following)
-            print("Database max_post_id:", self.database.get_max_post_id_for_username(following))
+            message = Message.sync_missing(
+                self.username, 
+                self.database.get_max_post_id_for_username(following), 
+                following
+                )
+
+            try:
+                user_info = await self.get_kademlia_info(following)
+                print(user_info)
+                reader, writer = await asyncio.open_connection(user_info.ip, user_info.port)
+
+                writer.write(message.encode())
+                writer.write_eof()
+                await writer.drain()
+
+                following_missing = await reader.read() 
+
+            except ConnectionRefusedError:
+                print(f'User {following} is offline')
+
+            missing_posts = json.loads(following_missing.decode())
+            for post in missing_posts:
+                print(post)
+                self.database.insert_post(post['id'], post['username'], post['body'], post['date'])
+
+
             
