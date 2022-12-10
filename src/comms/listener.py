@@ -26,7 +26,7 @@ class Listener(Thread):
         # nodes in the network would lose their neighbours gradually and the network
         # would eventually collapse.
         # This issue was also encountered in other groups
-        if(not self.user.logged_in):
+        if(not self.user.info.online):
             return
 
         message = await reader.read(-1)

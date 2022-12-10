@@ -10,6 +10,7 @@ class UserInfo:
     port : int
     followers : list[str]
     following : list[str]
+    online : bool
     last_post_id : int = 0
 
     def increment_post_id(self) -> int:
@@ -37,5 +38,6 @@ class UserInfo:
             user_info_json["port"],
             user_info_json["followers"],
             user_info_json["following"],
+            user_info_json["online"],
             user_info_json["last_post_id"]
         )

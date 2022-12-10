@@ -14,10 +14,9 @@ class User(Node):
         super().__init__(ip, port, bootstrap_file)
 
         self.username = username
-        self.logged_in = False
         self.database = None
 
-        self.info = UserInfo(ip, port, [], [])
+        self.info = UserInfo(ip, port, [], [], False)
         self.listener = Listener(self.info.ip, self.info.port, self)
         self.listener.daemon = True
         self.start_listening()
@@ -37,7 +36,7 @@ class User(Node):
     async def follow(self, username : str) -> None:
         """
         Follow a user
-        TODO: What happens when user is offline?
+        Only works if the user is online
         """
         if(username == self.username):
             return False
@@ -59,8 +58,7 @@ class User(Node):
     async def unfollow(self, username : str) -> None:
         """
         Unfollow a user
-        DONE: What happens when user is offline?
-        unfollow is persisted in db and when another post is received 
+        Works even if the user is offline 
         """
         unfollow_info = await self.get_kademlia_info(username)
 
@@ -78,7 +76,6 @@ class User(Node):
         """
         Post a message
         """
-
         if(body.strip() == "" or body == None):
             return False
 
@@ -105,17 +102,22 @@ class User(Node):
         if await self.get_kademlia_info(self.username) is not None:
             raise Exception(f'User {self.username} already exists')
         
+        for node in self.connected_nodes:
+            await self.send_message(node[0], node[1], Message.set_own_kademlia_info_message())
+        
+        self.info.online = True
+
         await self.set_kademlia_info(self.username, self.info)
         print(f'User {self.username} registered')
         self.init_database()
-        self.logged_in = True
         return True
 
     async def logout(self) -> None:
         """
         Logout the user
         """
-        self.logged_in = False
+        self.info.online = False
+        await self.set_kademlia_info(self.username, self.info)
         self.database = None
         return True
 
@@ -129,10 +131,9 @@ class User(Node):
         
         if own_kademlia_info is not None:
             info = own_kademlia_info
-            self.info = UserInfo(self.ip, self.port, info.followers, info.following, info.last_post_id)
+            self.info = UserInfo(self.ip, self.port, info.followers, info.following, True, info.last_post_id)
             await self.set_kademlia_info(self.username, self.info)
             self.init_database()
-            self.logged_in = True
             for node in self.connected_nodes:
                 await self.send_message(node[0], node[1], Message.set_own_kademlia_info_message())
             await self.get_missing_posts()
@@ -140,9 +141,8 @@ class User(Node):
         elif exists(join(getcwd(), 'database', 'db', f'{self.username}.db')):
             self.init_database()
             info = self.database.get_info()
-            self.info = UserInfo(self.ip, self.port, info['followers'], info['following'], info['last_post_id'])
+            self.info = UserInfo(self.ip, self.port, info['followers'], info['following'], True, info['last_post_id'])
             await self.set_kademlia_info(self.username, self.info)
-            self.logged_in = True
             for node in self.connected_nodes:
                 await self.send_message(node[0], node[1], Message.set_own_kademlia_info_message())
             await self.get_missing_posts()
@@ -188,6 +188,7 @@ class User(Node):
         Get the missing posts from the database when you are offline
         Since the previous last_post_id to the current last_post_id
         """
+        set
         for following in self.info.following:
             last_post_id = self.database.get_max_post_id_for_username(following)
             message = Message.sync_missing(
@@ -198,9 +199,19 @@ class User(Node):
 
             try:
                 following_info = await self.get_kademlia_info(following)
-                if following_info is not None:
+                # If user is online get the missing posts from them
+                if following_info is not None and following_info.online == True:
                     await self.send_message(following_info.ip, following_info.port, message)
-
+                # If user is offline get the missing posts from their followers
+                elif following_info.online == False:
+                    print(f'User {following} is offline')
+                    for int_following in following_info.followers:
+                        following_info = await self.get_kademlia_info(int_following)
+                        if following_info is not None and following_info.online == True:
+                            await self.send_message(following_info.ip, following_info.port, message)
+                        elif following_info.online == False:
+                            print(f'User {int_following} is offline')
+            # If the user is not found in the try and get the missing posts from other accounts
             except ConnectionRefusedError:
                 for int_following in self.info.following:
                     following_info = await self.get_kademlia_info(int_following)
