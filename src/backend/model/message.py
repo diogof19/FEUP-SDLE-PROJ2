@@ -50,3 +50,16 @@ class Message:
         Create a ping message
         """
         return Message.create_message('', 'ping', {})
+
+
+    @staticmethod
+    def sync_missing(self_user, last_post_id, username) -> str:
+        """
+        Create a sync missing message
+        """
+        return Message.create_message(self_user, "sync_posts", {
+            "last_post_id": last_post_id,
+            "username": username,
+        })
+
+
