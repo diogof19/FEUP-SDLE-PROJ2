@@ -150,3 +150,10 @@ class PostsDatabase:
             (post_id,)
         )
         return cursor.fetchone()[0]
+
+    def get_posts_since_post_id(self, username, post_id):
+        cursor = self.connection.execute(
+            'SELECT * FROM posts WHERE username = ? AND post_id > ? ORDER BY date DESC;',
+            (username, post_id)
+        )
+        return cursor.fetchall()

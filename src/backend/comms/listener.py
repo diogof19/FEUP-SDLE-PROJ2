@@ -1,7 +1,7 @@
 import asyncio
 from threading import Thread, Event
 from model.message import Message
-from comms.handlers import post_handler,follow_handler, set_own_kademlia_info_handler, unfollow_handler
+from comms.handlers import post_handler,follow_handler, set_own_kademlia_info_handler, unfollow_handler, sync_handler
 
 class Listener(Thread):
     def __init__(self, ip : str, port : int, user) -> None:
@@ -29,6 +29,8 @@ class Listener(Thread):
             await unfollow_handler(self.user.database, message['username'], self.user)
         elif (message['message_type'] == 'set_own_kademlia_info'):
             set_own_kademlia_info_handler(self.user)
+        elif (message['message_type'] == 'sync_posts'):
+            await sync_handler(self.user.database, message['username'], message['last_post_id'], self.user)
         else:
             print('Unknown message type', message['message_type'])
 

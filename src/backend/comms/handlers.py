@@ -14,6 +14,12 @@ async def unfollow_handler(db: PostsDatabase, username: str, user):
     user.info.followers.remove(username)
     await user.set_kademlia_info(user.username, user.info)
 
+async def sync_handler(db: PostsDatabase, username: str, post_id: int, user):
+    posts = db.get_posts_since_post_id(username, post_id)
+    for post in posts:
+        db.insert_post(post_id=post.post_id, username=post.username, body=post.body, date=post.date)
+
+
 async def post_handler(db: PostsDatabase, post_id: int, username: str, body: str, date: str, user):
     if(db.is_following(username)):
         db.insert_post(post_id=post_id, username=username, body=body, date=date)

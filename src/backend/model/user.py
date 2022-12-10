@@ -155,7 +155,8 @@ class User(Node):
         Reset the user's own info
         """
         print("Setting own info")
-        await self.set_kademlia_info(self.username, self.info)
+        while not self.logged_in and not await self.set_kademlia_info(self.username, self.info):
+            continue
         print("Set own info")
 
     async def ping(self, username : str) -> bool:
@@ -176,30 +177,26 @@ class User(Node):
         """
         print('following:', self.info.following)
         for following in self.info.following:
+            last_post_id = self.database.get_max_post_id_for_username(following)
             message = Message.sync_missing(
                 self.username, 
-                self.database.get_max_post_id_for_username(following), 
+                last_post_id, 
                 following
                 )
 
             try:
                 user_info = await self.get_kademlia_info(following)
-                print(user_info)
-                reader, writer = await asyncio.open_connection(user_info.ip, user_info.port)
 
-                writer.write(message.encode())
-                writer.write_eof()
-                await writer.drain()
-
-                following_missing = await reader.read() 
-
+                await self.send_message(user_info.ip, user_info.port, message)
+                following_missing = self.database.get_posts_since_post_id(last_post_id, following)
+                print(last_post_id)
+                print(self.database.get_max_post_id_for_username(following))
+                print(following_missing)
+                for post in following_missing:
+                    print(post)
             except ConnectionRefusedError:
                 print(f'User {following} is offline')
 
-            missing_posts = json.loads(following_missing.decode())
-            for post in missing_posts:
-                print(post)
-                self.database.insert_post(post['id'], post['username'], post['body'], post['date'])
 
 
             
