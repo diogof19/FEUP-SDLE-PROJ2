@@ -150,8 +150,7 @@ class User(Node):
         Reset the user's own info
         """
         print("Setting own info")
-        while not self.logged_in and not await self.set_kademlia_info(self.username, self.info):
-            continue
+        await self.set_kademlia_info(self.username, self.info)
         print("Set own info")
 
     async def ping(self, username : str) -> bool:
