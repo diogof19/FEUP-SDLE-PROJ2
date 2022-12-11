@@ -40,7 +40,8 @@ class PostsDatabase:
             );')
         self.connection.execute(
             'CREATE TABLE following (\
-                username TEXT PRIMARY KEY NOT NULL\
+                username TEXT PRIMARY KEY NOT NULL,\
+                was_notified BOOLEAN NOT NULL\
             );')
 
     def insert_post(self, post_id : int, username : str, body : str, date : str = None):
@@ -88,13 +89,13 @@ class PostsDatabase:
 
         return [follower[0] for follower in followers]
 
-    def add_following(self, username: str):
+    def add_following(self, username: str, was_notified: bool):
         """
         Adds a user to the following list
         """
         self.connection.execute(
-            'INSERT INTO following VALUES (?);',
-            (username,)
+            'INSERT INTO following (username, was_notified) VALUES (?, ?);',
+            (username,was_notified)
         )
 
     def del_following(self, username: str):
@@ -211,3 +212,16 @@ class PostsDatabase:
             (username, post_id)
         )
         return cursor.fetchall()
+        
+    def get_unotified_following(self):
+        cursor = self.connection.execute(
+            'SELECT username FROM following WHERE was_notified == false;'
+        )
+        unot = cursor.fetchall()
+        return [follow[0] for follow in unot]
+
+    def notified_following(self, username):
+        cursor = self.connection.execute(
+            'UPDATE following SET was_notified == True WHERE username == ?;',
+            (username,)
+        )

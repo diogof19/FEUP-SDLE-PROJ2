@@ -5,6 +5,7 @@ from database.database import PostsDatabase
 from comms.listener import Listener
 import asyncio
 import json
+from utils.node_utils import run_in_loop
 
 from os.path import exists, join
 from os import getcwd
@@ -19,7 +20,7 @@ class User(Node):
         self.info = UserInfo(ip, port, [], [], False)
         self.listener = Listener(self.info.ip, self.info.port, self)
         self.listener.daemon = True
-        self.start_listening()
+        self.start_listening()        
 
     def init_database(self):
         """
@@ -41,19 +42,33 @@ class User(Node):
         if(username == self.username):
             return False
 
-        new_follow_info = await self.get_kademlia_info(username)
+
+        if self.database.is_following(username):
+            return
         
-        if new_follow_info is None:
-            return None
+        
+    
         
         self.info.following.append(username)
         await self.set_kademlia_info(self.username, self.info)
-        
-        self.database.add_following(username)
-        new_follow_info.followers.append(self.username)
-        await self.set_kademlia_info(username, new_follow_info)
 
-        await self.send_message(new_follow_info.ip, new_follow_info.port, Message.follow_message(self.username))
+        print(str(self.info.following))
+
+        """
+        If username is not running the program (is not in the hash table), its registered has an unotified following
+        If username is running the program, his kademlia info is updated. Additionally, if he is currently online, a follow message is sent
+        """
+        if await self.ping(username):
+            new_follow_info = await self.get_kademlia_info(username)
+            new_follow_info.followers.append(self.username)
+            await self.set_kademlia_info(username, new_follow_info)
+            if new_follow_info.online:
+                await self.send_message(new_follow_info.ip, new_follow_info.port, Message.follow_message(self.username))
+                
+            self.database.add_following(username, True)
+        else:
+
+            self.database.add_following(username, False)
         
         return True
 
@@ -62,16 +77,29 @@ class User(Node):
         Unfollow a user
         Works even if the user is offline 
         """
-        unfollow_info = await self.get_kademlia_info(username)
 
-        if unfollow_info is None:
-            raise Exception(f'User {username} not found')
+        if(username == self.username):
+            return False
+
+
+        if not self.database.is_following(username):
+            return
+
+        
         
         self.info.following.remove(username)
         await self.set_kademlia_info(self.username, self.info)
         self.database.del_following(username)
 
-        await self.send_message(unfollow_info.ip, unfollow_info.port, Message.unfollow_message(self.username))
+        """
+        if username is not running the program (is not in the hash table), we cant modify his entry or send an unfollow message
+        """
+        if await self.ping(username):
+            unfollow_info = await self.get_kademlia_info(username)
+            unfollow_info.followers.remove(self.username)
+            await self.set_kademlia_info(username, unfollow_info)
+            if unfollow_info.online:
+                await self.send_message(unfollow_info.ip, unfollow_info.port, Message.unfollow_message(self.username))
 
 
     async def post(self, body : str) -> None:
@@ -139,7 +167,8 @@ class User(Node):
             for node in self.connected_nodes:
                 await self.send_message(node[0], node[1], Message.set_own_kademlia_info_message())
             await self.get_missing_posts()
-            self.sync_db_followers()
+            self.sync_followers()
+            await self.sync_following()
             return True
         elif exists(join(getcwd(), 'database', 'db', f'{self.username}.db')):
             self.init_database()
@@ -149,20 +178,25 @@ class User(Node):
             for node in self.connected_nodes:
                 await self.send_message(node[0], node[1], Message.set_own_kademlia_info_message())
             await self.get_missing_posts()
+            await self.sync_following()
             return True
 
         print(f'User {self.username} not found')
 
         return False
 
-    def sync_db_followers(self):
+    def sync_followers(self):
         """
         Sync the followers in the database
 
-        Only new followers are added as if there are any extra followers in the database they will be removed if a post is sent to them
+        Database followers list is updated according to the user's kademlia info
         """
         db_followers = self.database.get_followers()
 
+        for follower in db_followers:
+            if follower not in self.info.followers:
+                self.database.del_follower(follower)
+        
         for follower in self.info.followers:
             if follower not in db_followers:
                 self.database.add_follower(follower)
@@ -237,6 +271,15 @@ class User(Node):
                         except ConnectionRefusedError:
                             pass
 
-
-
-            
+    async def sync_following(self):
+        """
+        Sync users that self follows
+        """
+        print('test')
+        for unotified in self.database.get_unotified_following():
+            if await self.ping(unotified):
+                new_follow_info = await self.get_kademlia_info(unotified)
+                new_follow_info.followers.append(self.username)
+                await self.set_kademlia_info(unotified, new_follow_info)
+                await self.send_message(new_follow_info.ip, new_follow_info.port, Message.follow_message(self.username))
+                self.database.notified_following(unotified)
