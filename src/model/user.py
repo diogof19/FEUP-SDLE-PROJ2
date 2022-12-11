@@ -139,6 +139,7 @@ class User(Node):
             for node in self.connected_nodes:
                 await self.send_message(node[0], node[1], Message.set_own_kademlia_info_message())
             await self.get_missing_posts()
+            self.sync_db_followers()
             return True
         elif exists(join(getcwd(), 'database', 'db', f'{self.username}.db')):
             self.init_database()
