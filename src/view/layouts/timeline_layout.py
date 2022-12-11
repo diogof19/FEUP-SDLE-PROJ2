@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QVBoxLayout, QFrame, QGridLayout, QHBoxLayout, QLabel, QGroupBox, QSizePolicy, QScrollArea, QLineEdit, QPushButton, QStackedWidget
 from PySide6.QtCore import Slot, Qt, QSize
 from PySide6 import QtWidgets
+from functools import partial
 
 class TimelineLayout(QGridLayout):
     def __init__(self, parent):
@@ -330,15 +331,16 @@ class TimelineLayout(QGridLayout):
         followers_layout.setAlignment(Qt.AlignTop)
         
         followers = self.get_all_following()
-        for follower in followers:
+        for i in  range(len(followers)):
             follower_layout = QHBoxLayout()
-            
-            follower_name = self.create_follow_widget(follower)
+            temp_follow = followers[i]
+            follower_name = self.create_follow_widget(temp_follow)
             follower_name.setAlignment(Qt.AlignLeft)
             
             unfollow_button = QPushButton('Unfollow')
             unfollow_button.setObjectName('unfollow_button')
-            unfollow_button.clicked.connect(lambda: self.unfollow(follower))
+            partial_unfollow = partial(self.unfollow, temp_follow)
+            unfollow_button.clicked.connect(partial_unfollow)
             
             follower_layout.setSpacing(0)
             follower_layout.addWidget(follower_name)

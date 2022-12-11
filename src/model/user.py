@@ -167,7 +167,6 @@ class User(Node):
             for node in self.connected_nodes:
                 await self.send_message(node[0], node[1], Message.set_own_kademlia_info_message())
             await self.get_missing_posts()
-            self.logged_in = True
             self.sync_followers()
             await self.sync_following()
             return True
@@ -179,8 +178,7 @@ class User(Node):
             for node in self.connected_nodes:
                 await self.send_message(node[0], node[1], Message.set_own_kademlia_info_message())
             await self.get_missing_posts()
-
-            self.logged_in = True
+            await self.sync_following()
             return True
 
         print(f'User {self.username} not found')
