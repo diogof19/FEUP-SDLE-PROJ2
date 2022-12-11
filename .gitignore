@@ -2,3 +2,4 @@
 __pycache__/
 pyvenv.cfg
 src/database/db/*
+!src/database/db/.empty
